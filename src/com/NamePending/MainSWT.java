@@ -1,19 +1,10 @@
 package com.NamePending;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
-
 import org.eclipse.nebula.animation.AnimationRunner;
 import org.eclipse.nebula.animation.effects.AlphaEffect;
 import org.eclipse.nebula.animation.movement.ExpoOut;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;

@@ -14,6 +14,6 @@
 	<classpathentry kind="lib" path="C:/Users/061instructor/.p2/pool/plugins/org.eclipse.ui.workbench_3.107.0.v20150825-2206.jar" sourcepath="C:/Users/061instructor/.p2/pool/plugins/org.eclipse.ui.workbench_3.107.0.v20150825-2206.jar"/>
 	<classpathentry kind="lib" path="C:/Users/061instructor/.p2/pool/plugins/com.ibm.icu_54.1.1.v201501272100.jar" sourcepath="C:/Users/061instructor/.p2/pool/plugins/com.ibm.icu_54.1.1.v201501272100.jar"/>
 	<classpathentry kind="lib" path="C:/Users/061instructor/.p2/pool/plugins/org.eclipse.ui.forms_3.6.200.v20150506-2029.jar" sourcepath="C:/Users/061instructor/.p2/pool/plugins/org.eclipse.ui.forms_3.6.200.v20150506-2029.jar"/>
-	<classpathentry kind="lib" path="org.eclipse.nebula.widgets.gallery_0.6.0.201511041902.jar"/>
+	<classpathentry kind="lib" path="C:/Users/061instructor/.p2/pool/plugins/org.eclipse.nebula.widgets.gallery_0.6.0.201511041902.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
