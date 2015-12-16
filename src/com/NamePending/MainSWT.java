@@ -29,6 +29,10 @@ public class MainSWT {
 		shell.open();
 		AlphaEffect.setAlpha(animationRunner, shell, 160, 1900, new ExpoOut(), null, null);
 
+		
+		GameBoard gb = new GameBoard();
+		gb.UnitTest1();
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) 
 				display.sleep();
