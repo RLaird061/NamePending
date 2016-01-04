@@ -8,6 +8,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 public class MainSWT {
 	public static void main(String[] args) {
@@ -28,10 +31,20 @@ public class MainSWT {
 		// fade in                             160 alpha, 1.9 secs
 		shell.open();
 		AlphaEffect.setAlpha(animationRunner, shell, 160, 1900, new ExpoOut(), null, null);
-
+		
+		Button btnExit = new Button(shell, SWT.NONE);
+		btnExit.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				shell.close();
+			}
+		});
+		btnExit.setBounds(395, 10, 95, 31);
+		btnExit.setText("EXIT");
 		
 		GameBoard gb = new GameBoard();
-		gb.UnitTest1();
+		UnitTests ut = new UnitTests(gb);
+		ut.UnitTest1();
 		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) 
