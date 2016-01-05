@@ -4,18 +4,24 @@ import org.eclipse.nebula.animation.AnimationRunner;
 import org.eclipse.nebula.animation.effects.AlphaEffect;
 import org.eclipse.nebula.animation.movement.ExpoOut;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+
+import com.NamePending.unittest.UnitTests;
 
 public class MainSWT {
+	private static Display display;
+	private static Shell shell;
+	private static GameSWT gameFrame = null;
+	
 	public static void main(String[] args) {
-		Display display = new Display();
-		Shell shell = new Shell(display, SWT.NO_TRIM);
+		display = new Display();
+		shell = new Shell(display, SWT.NO_TRIM);
 		shell.setAlpha(0);
 		shell.setSize(500, 500);
 
@@ -39,8 +45,27 @@ public class MainSWT {
 				shell.close();
 			}
 		});
-		btnExit.setBounds(395, 10, 95, 31);
-		btnExit.setText("EXIT");
+		btnExit.setBounds(398, 458, 92, 32);
+		btnExit.setText("Exit");
+		
+		Button btnOpt = new Button(shell, SWT.NONE);
+		btnOpt.setText("Options");
+		btnOpt.setBounds(398, 420, 92, 32);
+		
+		Button btnPlay = new Button(shell, SWT.NONE);
+		btnPlay.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				// open GameSWT window and maybe close this window
+				
+				// TODO: move all this to a seperate process???
+				gameFrame = new GameSWT(0, 0); // TODO: put in center? params useless?
+				gameFrame.setLocation(shell.getBounds().x, shell.getBounds().y);
+				gameFrame.setVisible(true);
+			}
+		});
+		btnPlay.setText("Play");
+		btnPlay.setBounds(398, 382, 92, 32);
 		
 		GameBoard gb = new GameBoard();
 		UnitTests ut = new UnitTests(gb);
