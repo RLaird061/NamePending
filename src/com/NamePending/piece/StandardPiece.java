@@ -1,15 +1,16 @@
 package com.NamePending.piece;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
+import org.eclipse.swt.graphics.Image;
 
 public abstract class StandardPiece extends Piece
 {
     public static ArrayList<StandardPiece> pieces = populatePieces();
 
-    public StandardPiece(Color centerColor)
+    public StandardPiece(Color centerColor, Image image)
     {
-        super(centerColor);
+        super(centerColor, image);
     }
 
     protected static ArrayList<StandardPiece> populatePieces()
@@ -17,6 +18,11 @@ public abstract class StandardPiece extends Piece
         ArrayList<StandardPiece> pieces = new ArrayList<>();
         // TODO: add all standard pieces here
         pieces.add(new RedBrickPiece());
+        pieces.add(new RedMetalPiece());
+        pieces.add(new GreenBrickPiece());
+        pieces.add(new GreenMetalPiece());
+        pieces.add(new BlueBrickPiece());
+        pieces.add(new BlueMetalPiece());
         return pieces;
     }
 }

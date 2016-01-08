@@ -15,9 +15,11 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.NamePending.unittest.UnitTests;
 
 public class MainSWT {
-	private static Display display;
-	private static Shell shell;
-	private static GameSWT gameFrame = null;
+	public static GameSWT gameFrame = null;
+
+	private static Display display = null;
+	private static Shell shell = null;
+	private static GameOptions gameOpt = null;
 	
 	public static void main(String[] args) {
 		display = new Display();
@@ -48,7 +50,17 @@ public class MainSWT {
 		btnExit.setBounds(398, 458, 92, 32);
 		btnExit.setText("Exit");
 		
-		Button btnOpt = new Button(shell, SWT.NONE);
+		Button btnOpt = new Button(shell, SWT.NONE);	
+		btnOpt.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				// opens GameOptions window
+				
+				// TODO: make good-looking options window
+				gameOpt = new GameOptions();
+				gameOpt.setVisible(true);
+			}
+		});	
 		btnOpt.setText("Options");
 		btnOpt.setBounds(398, 420, 92, 32);
 		
@@ -67,14 +79,37 @@ public class MainSWT {
 		btnPlay.setText("Play");
 		btnPlay.setBounds(398, 382, 92, 32);
 		
-		GameBoard gb = new GameBoard();
-		UnitTests ut = new UnitTests(gb);
-		ut.UnitTest1();
+		//UnitTests ut = new UnitTests(gb);
+		//ut.UnitTest1();
 		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) 
 				display.sleep();
 		}
 		display.dispose();		
+	}
+
+	public static Display getDisplay() {
+		return display;
+	}
+
+	public static void setDisplay(Display display) {
+		MainSWT.display = display;
+	}
+
+	public static Shell getShell() {
+		return shell;
+	}
+
+	public static void setShell(Shell shell) {
+		MainSWT.shell = shell;
+	}
+
+	public static GameSWT getGameFrame() {
+		return gameFrame;
+	}
+
+	public static void setGameFrame(GameSWT gameFrame) {
+		MainSWT.gameFrame = gameFrame;
 	}
 }

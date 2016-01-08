@@ -1,11 +1,17 @@
 package com.NamePending.piece;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
+import org.eclipse.swt.graphics.Image;
+
+import com.NamePending.Utils;
 
 public abstract class Piece
 {
     private Color centerColor;
+    private Image image;
 
     public static ArrayList<Piece> pieces = populatePieces();
 
@@ -20,11 +26,13 @@ public abstract class Piece
     public Piece(Piece p)
     {
     	this.centerColor = p.centerColor;
+    	this.image = p.image;
     }
     
-    public Piece(Color centerColor)
+    public Piece(Color centerColor, Image image)
     {
         this.centerColor = centerColor;
+        this.image = image;
     }
 
     public static byte getPieceIndex(Piece piece)
@@ -45,6 +53,11 @@ public abstract class Piece
     public Color getCenterColor()
     {
         return centerColor;
+    }
+    
+    public BufferedImage getImage()
+    {
+    	return Utils.convertToAWT(image.getImageData());
     }
 
     @Override

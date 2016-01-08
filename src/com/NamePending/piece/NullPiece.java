@@ -6,6 +6,6 @@ public class NullPiece extends Piece
 {
     public NullPiece()
     {
-        super(Color.BLACK);
+        super(Color.BLACK, null);
     }
 }
