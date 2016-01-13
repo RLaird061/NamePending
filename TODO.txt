@@ -1,0 +1,22 @@
+- game logic
+  - swapping
+  - swap animation
+  - piece removal and scoring
+  - piece removal replacement
+  - piece removal animation
+
+- options
+ - persistant options (either in file or database)
+ - fullscreen (not maximized)
+
+- game over screen
+
+- game installer??
+
+- game tutorial??
+
+- mouse controls
+
+- sliding/something(transition wise) BACKGROUND IMAGE (night and day or something)
+
+- high score (DATABASE)

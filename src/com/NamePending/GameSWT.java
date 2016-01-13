@@ -26,7 +26,7 @@ public class GameSWT extends JFrame
 	private final static int SELECTOR_HEIGHT = 45;
 	
 	// Member Variables
-	private BufferedImage image;
+	private BufferedImage image; // TODO: transition of some sort
 	private int selectorX = 0;
 	private int selectorY = 0;
 	private int cursorX = 0;
@@ -76,7 +76,6 @@ public class GameSWT extends JFrame
 	public void setImage(BufferedImage bufferedImage)
 	{
 		this.image = bufferedImage;
-		this.repaint(); // TODO: is this needed?
 	}
 
 	@Override
@@ -150,14 +149,12 @@ public class GameSWT extends JFrame
 			selectorX = 0;
 			selectorY = 0;
 		}
-		this.repaint(); // TODO: is this needed?
 	}
 
 	public synchronized void setCursorPos(int x, int y)
 	{
 		this.cursorX = x;
 		this.cursorY = y;
-		this.repaint(); // TODO: is this needed?
 	}
 
 	private static void drawOutlineRect(Graphics g, Color color, int x, int y, int width, int height, int opacity)

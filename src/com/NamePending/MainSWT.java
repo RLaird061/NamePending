@@ -38,7 +38,7 @@ public class MainSWT {
 
 		// fade in                             160 alpha, 1.9 secs
 		shell.open();
-		AlphaEffect.setAlpha(animationRunner, shell, 160, 1900, new ExpoOut(), null, null);
+		AlphaEffect.setAlpha(animationRunner, shell, 255, 1900, new ExpoOut(), null, null);
 		
 		Button btnExit = new Button(shell, SWT.NONE);
 		btnExit.addMouseListener(new MouseAdapter() {
