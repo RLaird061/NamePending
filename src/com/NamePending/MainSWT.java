@@ -44,6 +44,8 @@ public class MainSWT {
 		btnExit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
+				if (gameFrame != null)
+					gameFrame.dispose();
 				shell.close();
 			}
 		});
