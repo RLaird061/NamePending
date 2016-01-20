@@ -1,6 +1,7 @@
 package com.NamePending.piece;
 
-import java.awt.*;
+import java.awt.Color;
+import org.eclipse.swt.widgets.Composite;
 
 public class NullPiece extends Piece
 {

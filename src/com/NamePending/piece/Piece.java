@@ -1,17 +1,16 @@
 package com.NamePending.piece;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import org.eclipse.swt.graphics.Image;
-
-import com.NamePending.Utils;
+import org.eclipse.swt.widgets.Composite;
 
 public abstract class Piece
 {
     private Color centerColor;
     private Image image;
+    private Composite composite = null;
 
     public static ArrayList<Piece> pieces = populatePieces();
 
@@ -33,8 +32,8 @@ public abstract class Piece
     {
         this.centerColor = centerColor;
         this.image = image;
-    }
-
+    }  
+    
     public static byte getPieceIndex(Piece piece)
     {
         if (piece == null)
@@ -55,14 +54,15 @@ public abstract class Piece
         return centerColor;
     }
     
-    public BufferedImage getImage()
+    public Image getImage()
     {
-    	return Utils.convertToAWT(image.getImageData());
+    	return image;
     }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        return o.getClass().equals(this.getClass());
+    public void setComposite(Composite composite) {
+		this.composite = composite;
+	}
+    public Composite getComposite() {
+    	return composite;
     }
 }

@@ -2,7 +2,9 @@ package com.NamePending.piece;
 
 import java.awt.Color;
 import java.util.ArrayList;
+
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
 
 public abstract class StandardPiece extends Piece
 {

@@ -1,6 +1,4 @@
 - game logic
-  - swapping
-  - swap animation
   - piece removal and scoring
   - piece removal replacement
   - piece removal animation
@@ -20,3 +18,11 @@
 - sliding/something(transition wise) BACKGROUND IMAGE (night and day or something)
 
 - high score (DATABASE)
+
+
+
+
+
+DONE:
+  - swapping
+  - swap animation

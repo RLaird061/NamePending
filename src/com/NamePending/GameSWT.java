@@ -1,171 +1,69 @@
 package com.NamePending;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FillLayout;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.eclipse.swt.graphics.Image;
-
-import com.NamePending.piece.Piece;
-
-public class GameSWT extends JFrame
+public class GameSWT extends Composite
 {
 	// Constants
-	private final static int OUTLINE_WIDTH = 2;
-	private final static int BORDER_WIDTH = 7;
-	private final static int PIECES_PER_ROW = 6;
-	private final static int PIECES_PER_COL = 12;
-	private final static int PIECE_LENGTH = 45;
-	private final static int SELECTOR_WIDTH = 90;
-	private final static int SELECTOR_HEIGHT = 45;
+	public final static int OUTLINE_WIDTH = 2;
+	public final static int BORDER_WIDTH = 7;
+	public final static int PIECES_PER_ROW = 6;
+	public final static int PIECES_PER_COL = 12;
+	public final static int PIECE_LENGTH = 45;
+	public final static int SELECTOR_WIDTH = 90;
+	public final static int SELECTOR_HEIGHT = 45;
 	
 	// Member Variables
-	private BufferedImage image; // TODO: transition of some sort
-	private int selectorX = 0;
-	private int selectorY = 0;
-	private int cursorX = 0;
-	private int cursorY = 0;
-
-	private GameBoard gb;
+	private GameBoard gameboard;    // holds game logic
+	private GameComposite gamecomp; // game drawing
 
 	// Member Functions
-	public GameSWT(int x, int y)
-	{
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setSize(300, 590);
-		this.setContentPane(new ImagePanel());
-		this.gb = new GameBoard(PIECES_PER_ROW, PIECES_PER_COL);
-
-		KeyListener listener = new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// Handle ARROW keys and SWAP(space)
-				if (KeyEvent.getKeyText(e.getKeyCode()) == "Up") {
-					selectorY = (selectorY > 0) ? selectorY-1 : selectorY;
-				} else if (KeyEvent.getKeyText(e.getKeyCode()) == "Right") {
-					selectorX = (selectorX < PIECES_PER_ROW-2) ? selectorX+1 : selectorX;
-				} else if (KeyEvent.getKeyText(e.getKeyCode()) == "Down") {
-					selectorY = (selectorY < PIECES_PER_COL-1) ? selectorY+1 : selectorY;
-				} else if (KeyEvent.getKeyText(e.getKeyCode()) == "Left") {
-					selectorX = (selectorX > 0) ? selectorX-1 : selectorX;					
-				} else if (KeyEvent.getKeyText(e.getKeyCode()) == "Space") {
-					// TODO: swap and recompute board!
-				}
-				repaint();
-			}
-
+	public GameSWT(Composite parent, int style) {
+		super(parent, style);
+		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				System.out.println("keyReleased="+KeyEvent.getKeyText(e.getKeyCode()));
 			}
-		};
-		addKeyListener(listener);
-		setFocusable(true); // you need this for KeyListener to work or the code won't work >:c
-	}
-
-	public void setImage(BufferedImage bufferedImage)
-	{
-		this.image = bufferedImage;
-	}
-
-	@Override
-	public void setVisible(boolean visible)
-	{
-		super.setVisible(visible);
-	}
-
-	private class ImagePanel extends JPanel
-	{
-		@Override
-		public void paint(Graphics g)
-		{
-			super.paint(g);
-			if (image != null)
-			{
-				g.drawImage(image, 0, 0, this);
-			}
-
-			if (gb != null)
-			{
-				for(int y = 0; y < PIECES_PER_COL; y++)
-				{
-					for(int x = 0; x < PIECES_PER_ROW; x++)
-					{
-						Piece p = gb.get(y * PIECES_PER_ROW + x);
-					
-						int xPos = BORDER_WIDTH + x * PIECE_LENGTH;
-						int yPos = BORDER_WIDTH + y * PIECE_LENGTH;
-
-						Color origColor = p.getCenterColor();
-						BufferedImage img = p.getImage();
-							
-						g.drawImage(img, xPos, yPos, null);
-						
-						// uncomment below to have border around pieces
-						//drawOutlineRect(g, origColor, xPos, yPos, 
-						//		PIECE_LENGTH, PIECE_LENGTH, 20);
-					}
+			public void keyPressed(KeyEvent e) {
+				// Handle ARROW keys and SWAP(space)
+				System.out.println(e.toString());
+				Point p = gamecomp.getSelector();
+				int selX = p.x;
+				int selY = p.y;
+				if (e.keyCode == 0x1000001) { // Up
+					selY = (selY > 0) ? selY-1 : selY;
+				} else if (e.keyCode == 0x1000004) { // Down
+					selX = (selX < PIECES_PER_ROW-2) ? selX+1 : selX;
+				} else if (e.keyCode == 0x1000002) { // Right
+					selY = (selY < PIECES_PER_COL-1) ? selY+1 : selY;
+				} else if (e.keyCode == 0x1000003) { // Left
+					selX = (selX > 0) ? selX-1 : selX;					
+				} else if (e.keyCode == 0x20) { // Space
+					gameboard.swap(selY * PIECES_PER_ROW + selX);
 				}
+				gamecomp.setSelector(new Point(selX, selY));
+				redraw(0, 0, parent.getBounds().width, parent.getBounds().height, true);
 			}
-			
-			if (selectorX > -1)
-			{
-				g.setColor(new Color(255, 255, 0, 120));
-				int xPos = BORDER_WIDTH + selectorX * PIECE_LENGTH;
-				int yPos = BORDER_WIDTH + selectorY * PIECE_LENGTH;
-				g.fillRect(xPos, yPos, 
-						SELECTOR_WIDTH, SELECTOR_HEIGHT);
-				drawOutlineRect(g, new Color(255,255,0), xPos, yPos,
-						SELECTOR_WIDTH, SELECTOR_HEIGHT, 20);
-			}
+		});
 
-			if (cursorX > 0 && cursorY > 0)
-			{
-				g.setColor(Color.GREEN);
-				g.fillOval(cursorX, cursorY, 3, 3);
-			}
-		}
-	}
-
-	public void setSelectorPosition(Point point)
-	{
-		if (point != null)
-		{
-			selectorX = point.x;
-			selectorY = point.y;
-		}
-		else
-		{
-			selectorX = 0;
-			selectorY = 0;
-		}
-	}
-
-	public synchronized void setCursorPos(int x, int y)
-	{
-		this.cursorX = x;
-		this.cursorY = y;
-	}
-
-	private static void drawOutlineRect(Graphics g, Color color, int x, int y, int width, int height, int opacity)
-	{
-		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity));
-		g.fillRect(x, y, width, height);
-
-		g.setColor(color);
-		g.fillRect(x, y, width, OUTLINE_WIDTH);
-		g.fillRect(x + width - OUTLINE_WIDTH, y, OUTLINE_WIDTH, height);
-		g.fillRect(x, y + height - OUTLINE_WIDTH, width, OUTLINE_WIDTH);
-		g.fillRect(x, y, OUTLINE_WIDTH, height);
+		setSize(BORDER_WIDTH*2 + PIECES_PER_ROW*PIECE_LENGTH, 
+				BORDER_WIDTH*2 + PIECES_PER_COL*PIECE_LENGTH);
+		
+		gamecomp = new GameComposite(this, SWT.DOUBLE_BUFFERED);
+		gamecomp.setSelector(new Point(0,0)); // start selector at top left
+		gameboard = new GameBoard(PIECES_PER_ROW, PIECES_PER_COL);
+		gameboard.setComposite(gamecomp);
+		
+		setFocus();
 	}
 }

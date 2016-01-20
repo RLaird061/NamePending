@@ -16,7 +16,6 @@ import com.NamePending.unittest.UnitTests;
 
 public class MainSWT {
 	public static GameSWT gameFrame = null;
-
 	private static Display display = null;
 	private static Shell shell = null;
 	private static GameOptions gameOpt = null;
@@ -73,9 +72,11 @@ public class MainSWT {
 				// open GameSWT window and maybe close this window
 				
 				// TODO: move all this to a seperate process???
-				gameFrame = new GameSWT(0, 0); // TODO: put in center? params useless?
-				gameFrame.setLocation(shell.getBounds().x, shell.getBounds().y);
-				gameFrame.setVisible(true);
+				Shell gameShell = new Shell(display, SWT.NONE);
+				gameFrame = new GameSWT(gameShell, SWT.NONE); // TODO: put in center? params useless?
+				gameShell.setLocation(shell.getBounds().x, shell.getBounds().y);
+				gameShell.pack();
+				gameShell.open();
 			}
 		});
 		btnPlay.setText("Play");
@@ -85,8 +86,12 @@ public class MainSWT {
 		//ut.UnitTest1();
 		
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) 
-				display.sleep();
+				try {
+					if (!display.readAndDispatch()) 
+						display.sleep();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 		}
 		display.dispose();		
 	}
