@@ -139,7 +139,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}		
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 		
-		tm.setTransition(st);
+		tm.setTransition(dct);
 		tm.startTransition(0, 0, getDirection(0,0));
 	}
 

@@ -166,21 +166,37 @@ public class DoubleCubicRotationTransition extends Transition {
             break;
         
         case (int)DIR_UP:
+        	// first cube rotates up second rotates down
             _a1[FIRST_CUBE] = _h[FIRST_CUBE] / (double)(_halfT * _halfT);
             _a2[FIRST_CUBE] = _w[FIRST_CUBE] / (double)(_halfT * _halfT);
             _y[FIRST_CUBE] = _h[FIRST_CUBE];
             _destWidth[FIRST_CUBE] = _w[FIRST_CUBE];
             _dy1[FIRST_CUBE] = _dy2[FIRST_CUBE] = _h[FIRST_CUBE] - _quality * (_h[FIRST_CUBE] - 1) / 100.0;
             _remainedSize[FIRST_CUBE] = _h[FIRST_CUBE] - ((int)(_h[FIRST_CUBE] / _dy1[FIRST_CUBE]) * _dy1[FIRST_CUBE]);
+            
+            _a1[SECOND_CUBE] = _h[SECOND_CUBE] / (double)(_halfT * _halfT);
+            _a2[SECOND_CUBE] = _w[SECOND_CUBE] / (double)(_halfT * _halfT);
+            _y[SECOND_CUBE] = 0;
+            _destWidth[SECOND_CUBE] = 0;
+            _dy1[SECOND_CUBE] = _dy2[SECOND_CUBE] = _h[SECOND_CUBE] - _quality * (_h[SECOND_CUBE] - 1) / 100.0;
+            _remainedSize[SECOND_CUBE] = _h[SECOND_CUBE] - ((int)(_h[SECOND_CUBE] / _dy1[SECOND_CUBE]) * _dy1[SECOND_CUBE]);
             break;
             
         case (int)DIR_DOWN:
+        	// first cube rotates down second rotates up
             _a1[FIRST_CUBE] = _h[FIRST_CUBE] / (double)(_halfT * _halfT);
             _a2[FIRST_CUBE] = _w[FIRST_CUBE] / (double)(_halfT * _halfT);
             _y[FIRST_CUBE] = 0;
             _destWidth[FIRST_CUBE] = 0;
             _dy1[FIRST_CUBE] = _dy2[FIRST_CUBE] = _h[FIRST_CUBE] - _quality * (_h[FIRST_CUBE] - 1) / 100.0;
             _remainedSize[FIRST_CUBE] = _h[FIRST_CUBE] - ((int)(_h[FIRST_CUBE] / _dy1[FIRST_CUBE]) * _dy1[FIRST_CUBE]);
+            
+            _a1[SECOND_CUBE] = _h[SECOND_CUBE] / (double)(_halfT * _halfT);
+            _a2[SECOND_CUBE] = _w[SECOND_CUBE] / (double)(_halfT * _halfT);
+            _y[SECOND_CUBE] = _h[SECOND_CUBE];
+            _destWidth[SECOND_CUBE] = _w[SECOND_CUBE];
+            _dy1[SECOND_CUBE] = _dy2[SECOND_CUBE] = _h[SECOND_CUBE] - _quality * (_h[SECOND_CUBE] - 1) / 100.0;
+            _remainedSize[SECOND_CUBE] = _h[SECOND_CUBE] - ((int)(_h[SECOND_CUBE] / _dy1[SECOND_CUBE]) * _dy1[SECOND_CUBE]);
             break;
         }
    
@@ -303,14 +319,23 @@ public class DoubleCubicRotationTransition extends Transition {
             break;
             
         case (int)DIR_LEFT:
-            
+        	
+        	// first cube left
             _ratio1[FIRST_CUBE] = (_x[FIRST_CUBE]) / _w[FIRST_CUBE];
             _ratio2[FIRST_CUBE] = (_w[FIRST_CUBE] - _x[FIRST_CUBE]) / _w[FIRST_CUBE];
             
             _dy1[FIRST_CUBE] = _dx1[FIRST_CUBE] * (_h[FIRST_CUBE] - _destHeight[FIRST_CUBE]) / (2.0 * _w[FIRST_CUBE]);
             _dy2[FIRST_CUBE] = _dx2[FIRST_CUBE] * (_destHeight[FIRST_CUBE]) / (2.0 * _w[FIRST_CUBE]);
             _x1[FIRST_CUBE] = 0; _y1[FIRST_CUBE] = (_h[FIRST_CUBE] - _destHeight[FIRST_CUBE]) / 2.0; _x2[FIRST_CUBE] = 0; _y2[FIRST_CUBE] = 0;
+            // second cube right
+            _ratio1[SECOND_CUBE] = (_w[SECOND_CUBE] - _x[SECOND_CUBE]) / _w[SECOND_CUBE];
+            _ratio2[SECOND_CUBE] = (_x[SECOND_CUBE]) / _w[SECOND_CUBE];
             
+            _dy1[SECOND_CUBE] = _dx1[SECOND_CUBE] * (_destHeight[SECOND_CUBE]) / (2.0 * _w[SECOND_CUBE]);
+            _dy2[SECOND_CUBE] = _dx2[SECOND_CUBE] * (_h[SECOND_CUBE] - _destHeight[SECOND_CUBE]) / (2.0 * _w[SECOND_CUBE]);
+            _x1[SECOND_CUBE] = 0; _y1[SECOND_CUBE] = 0; _x2[SECOND_CUBE] = 0; _y2[SECOND_CUBE] = (_h[SECOND_CUBE] - _destHeight[SECOND_CUBE]) / 2.0;
+            
+            // first cube left
             for (; _x1[FIRST_CUBE] < _w[FIRST_CUBE]; _x1[FIRST_CUBE] += _dx1[FIRST_CUBE]) {
                 try {
                     gc.drawImage(from, (int) _x1[FIRST_CUBE], 0, (int) _dx1[FIRST_CUBE], _h[FIRST_CUBE],
@@ -335,41 +360,79 @@ public class DoubleCubicRotationTransition extends Transition {
                             , (int) _remainedSize[FIRST_CUBE], (int) (_h[FIRST_CUBE] - _y2[FIRST_CUBE] - _y2[FIRST_CUBE]));
                 }
             }
+            // second cube right
+            for (; _x1[SECOND_CUBE] < _w[SECOND_CUBE]; _x1[SECOND_CUBE] += _dx1[SECOND_CUBE]) {
+                try {
+                    _x2[SECOND_CUBE] = _x1[SECOND_CUBE];
+                    gc.drawImage(to, (int) _x1[SECOND_CUBE], 0, (int) _dx1[SECOND_CUBE], _h[SECOND_CUBE],
+                            (int) (_x[SECOND_CUBE] + _x1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _w[FIRST_CUBE], (int) _y1[SECOND_CUBE]
+                            , (int) _dx1[SECOND_CUBE], (int) (_h[SECOND_CUBE] - _y1[SECOND_CUBE] - _y1[SECOND_CUBE]));
+                    gc.drawImage(from, (int) _x2[SECOND_CUBE], 0, (int) _dx2[SECOND_CUBE], _h[SECOND_CUBE],
+                            (int) (_x2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _w[FIRST_CUBE], (int) _y2[SECOND_CUBE]
+                            , (int) _dx2[SECOND_CUBE], (int) (_h[SECOND_CUBE] - _y2[SECOND_CUBE] - _y2[SECOND_CUBE]));
+                    _y1[SECOND_CUBE] += _dy1[SECOND_CUBE];
+                    _y2[SECOND_CUBE] -= _dy2[SECOND_CUBE];
+                } catch (Exception e) {
+                    gc.drawImage(to, (int) _x1[SECOND_CUBE], 0, (int) _remainedSize[SECOND_CUBE], _h[SECOND_CUBE],
+                            (int) (_x[SECOND_CUBE] + _x1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _w[FIRST_CUBE], (int) _y1[SECOND_CUBE]
+                            , (int) _remainedSize[SECOND_CUBE], (int) (_h[SECOND_CUBE] - _y1[SECOND_CUBE] - _y1[SECOND_CUBE]));
+                    gc.drawImage(from, (int) _x2[SECOND_CUBE], 0, (int) _remainedSize[SECOND_CUBE], _h[SECOND_CUBE],
+                            (int) (_x2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _w[FIRST_CUBE], (int) _y2[SECOND_CUBE]
+                            , (int) _remainedSize[SECOND_CUBE], (int) (_h[SECOND_CUBE] - _y2[SECOND_CUBE] - _y2[SECOND_CUBE]));
+                }
+            }
         
             if( t <= _halfT ) {
-                
+                // first cube left
                 _tSqrd = t * t;
                 _x[FIRST_CUBE] = _w[FIRST_CUBE] - Math.min(0.5 * _a1[FIRST_CUBE] * _tSqrd, _halfW[FIRST_CUBE]);
                 _destHeight[FIRST_CUBE] = _h[FIRST_CUBE] - Math.min(0.5 * _a2[FIRST_CUBE] * _tSqrd, _halfH[FIRST_CUBE]);
-                
+                // second cube right
+                _x[SECOND_CUBE] = Math.min(0.5 * _a1[SECOND_CUBE] * _tSqrd, _halfW[SECOND_CUBE]);
+                _destHeight[SECOND_CUBE] = Math.min(0.5 * _a2[SECOND_CUBE] * _tSqrd, _halfH[SECOND_CUBE]);
             } else {
                 
                 if(!_flag1) {
-                    
+                	// first cube left
                     _x0[FIRST_CUBE] = _w[FIRST_CUBE] - _x[FIRST_CUBE]; _destHeight0[FIRST_CUBE] = _h[FIRST_CUBE] - _destHeight[FIRST_CUBE];
                     _v0[FIRST_CUBE] = _a1[FIRST_CUBE] * t; _destHeightV0[FIRST_CUBE] = _a2[FIRST_CUBE] * t;
                     _a1[FIRST_CUBE] *= -1.0; _a2[FIRST_CUBE] *= -1.0;
+                    // second cube right
+                    _x0[SECOND_CUBE] = _x[SECOND_CUBE]; _destHeight0[SECOND_CUBE] = _destHeight[SECOND_CUBE];
+                    _v0[SECOND_CUBE] = _a1[SECOND_CUBE] * t; _destHeightV0[SECOND_CUBE] = _a2[SECOND_CUBE] * t;
+                    _a1[SECOND_CUBE] *= -1.0; _a2[SECOND_CUBE] *= -1.0;
                     _flag1 = true;
-                    
                 }
                 
                 _t1 = t - _halfT;
                 _tSqrd = _t1 * _t1;
+                // first cube left
                 _x[FIRST_CUBE] = _w[FIRST_CUBE] - Math.min(_x0[FIRST_CUBE] + _v0[FIRST_CUBE] * _t1 + 0.5 * _a1[FIRST_CUBE] * _tSqrd, _w[FIRST_CUBE]);
                 _destHeight[FIRST_CUBE] = _h[FIRST_CUBE] - Math.min(_destHeight0[FIRST_CUBE] + _destHeightV0[FIRST_CUBE] * _t1 + 0.5 * _a2[FIRST_CUBE] * _tSqrd, _h[FIRST_CUBE]);
-                
+                // second cube right
+                _x[SECOND_CUBE] = Math.min(_x0[SECOND_CUBE] + _v0[SECOND_CUBE] * _t1 + 0.5 * _a1[SECOND_CUBE] * _tSqrd, _w[SECOND_CUBE]);
+                _destHeight[SECOND_CUBE] = Math.min(_destHeight0[SECOND_CUBE] + _destHeightV0[SECOND_CUBE] * _t1 + 0.5 * _a2[SECOND_CUBE] * _tSqrd, _h[SECOND_CUBE]);
             }
             break;
         
         case (int)DIR_UP:
             
+        	// first cube up
             _ratio1[FIRST_CUBE] = (_y[FIRST_CUBE]) / _h[FIRST_CUBE];
             _ratio2[FIRST_CUBE] = (_h[FIRST_CUBE] - _y[FIRST_CUBE]) / _h[FIRST_CUBE];
             
             _dx1[FIRST_CUBE] = _dy1[FIRST_CUBE] * (_w[FIRST_CUBE] - _destWidth[FIRST_CUBE]) / (2.0 * _h[FIRST_CUBE]);
             _dx2[FIRST_CUBE] = _dy2[FIRST_CUBE] * (_destWidth[FIRST_CUBE]) / (2.0 * _h[FIRST_CUBE]);
             _y1[FIRST_CUBE] = 0; _x1[FIRST_CUBE] = (_w[FIRST_CUBE] - _destWidth[FIRST_CUBE]) / 2.0; _y2[FIRST_CUBE] = 0; _x2[FIRST_CUBE] = 0;
+            // second cube down
+            _ratio1[SECOND_CUBE] = (_h[SECOND_CUBE] - _y[SECOND_CUBE]) / _h[SECOND_CUBE];
+            _ratio2[SECOND_CUBE] = (_y[SECOND_CUBE]) / _h[SECOND_CUBE];
             
+            _dx1[SECOND_CUBE] = _dy1[SECOND_CUBE] * (_destWidth[SECOND_CUBE]) / (2.0 * _h[SECOND_CUBE]);
+            _dx2[SECOND_CUBE] = _dy2[SECOND_CUBE] * (_w[SECOND_CUBE] - _destWidth[SECOND_CUBE]) / (2.0 * _h[SECOND_CUBE]);
+            _y1[SECOND_CUBE] = 0; _x1[SECOND_CUBE] = 0; _y2[SECOND_CUBE] = 0; _x2[SECOND_CUBE] = (_w[SECOND_CUBE] - _destWidth[SECOND_CUBE]) / 2.0;
+            
+            // first cube up
             for (; _y1[FIRST_CUBE] < _h[FIRST_CUBE]; _y1[FIRST_CUBE] += _dy1[FIRST_CUBE]) {
                 try {
                     gc.drawImage(from, 0, (int) _y1[FIRST_CUBE], _w[FIRST_CUBE], (int) _dy1[FIRST_CUBE]
@@ -394,41 +457,82 @@ public class DoubleCubicRotationTransition extends Transition {
                             , (int) (_w[FIRST_CUBE] - _x2[FIRST_CUBE] - _x2[FIRST_CUBE]), (int) _remainedSize[FIRST_CUBE]);
                 }
             }
+            // second cube down
+            for (; _y1[SECOND_CUBE] < _h[SECOND_CUBE]; _y1[SECOND_CUBE] += _dy1[SECOND_CUBE]) {
+                try {
+                    _y2[SECOND_CUBE] = _y1[SECOND_CUBE];
+                    gc.drawImage(to, 0, (int) _y1[SECOND_CUBE], _w[SECOND_CUBE], (int) _dy1[SECOND_CUBE]
+                            , (int) _x1[SECOND_CUBE], (int) (_y[SECOND_CUBE] + _y1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x1[SECOND_CUBE] - _x1[SECOND_CUBE]), (int) _dy1[SECOND_CUBE]);
+                    gc.drawImage(from, 0, (int) _y2[SECOND_CUBE], _w[SECOND_CUBE], (int) _dy2[SECOND_CUBE]
+                            , (int) _x2[SECOND_CUBE], (int) (_y2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x2[SECOND_CUBE] - _x2[SECOND_CUBE]), (int) _dy2[SECOND_CUBE]);
+                    _x1[SECOND_CUBE] += _dx1[SECOND_CUBE];
+                    _x2[SECOND_CUBE] -= _dx2[SECOND_CUBE];
+                } catch (Exception e) {
+                    gc.drawImage(to, 0, (int) _y1[SECOND_CUBE], _w[SECOND_CUBE], (int) _remainedSize[SECOND_CUBE]
+                            , (int) _x1[SECOND_CUBE], (int) (_y[SECOND_CUBE] + _y1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x1[SECOND_CUBE] - _x1[SECOND_CUBE]), (int) _remainedSize[SECOND_CUBE]);
+                    gc.drawImage(from, 0, (int) _y2[SECOND_CUBE], _w[SECOND_CUBE], (int) _remainedSize[SECOND_CUBE]
+                            , (int) _x2[SECOND_CUBE], (int) (_y2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x2[SECOND_CUBE] - _x2[SECOND_CUBE]), (int) _remainedSize[SECOND_CUBE]);
+                }
+            }            
         
             if( t <= _halfT ) {
-                
+            	// first cube up
                 _tSqrd = t * t;
                 _y[FIRST_CUBE] = _h[FIRST_CUBE] - Math.min(0.5 * _a1[FIRST_CUBE] * _tSqrd, _halfH[FIRST_CUBE]);
                 _destWidth[FIRST_CUBE] = _w[FIRST_CUBE] - Math.min(0.5 * _a2[FIRST_CUBE] * _tSqrd, _halfW[FIRST_CUBE]);
-                
+                // second cube down
+                _y[SECOND_CUBE] = Math.min(0.5 * _a1[SECOND_CUBE] * _tSqrd, _halfH[SECOND_CUBE]);
+                _destWidth[SECOND_CUBE] = Math.min(0.5 * _a2[SECOND_CUBE] * _tSqrd, _halfW[SECOND_CUBE]);
             } else {
                 
                 if(!_flag1) {
-                    
+
+                	// first cube up
                     _y0[FIRST_CUBE] = _h[FIRST_CUBE] - _y[FIRST_CUBE]; _destWidth0[FIRST_CUBE] = _w[FIRST_CUBE] - _destWidth[FIRST_CUBE];
                     _v0[FIRST_CUBE] = _a1[FIRST_CUBE] * t; _destWidthV0[FIRST_CUBE] = _a2[FIRST_CUBE] * t;
                     _a1[FIRST_CUBE] *= -1.0; _a2[FIRST_CUBE] *= -1.0;
+                    // second cube down
+                    _y0[SECOND_CUBE] = _y[SECOND_CUBE]; _destWidth0[SECOND_CUBE] = _destWidth[SECOND_CUBE];
+                    _v0[SECOND_CUBE] = _a1[SECOND_CUBE] * t; _destWidthV0[SECOND_CUBE] = _a2[SECOND_CUBE] * t;
+                    _a1[SECOND_CUBE] *= -1.0; _a2[SECOND_CUBE] *= -1.0;
                     _flag1 = true;
                     
                 }
                 
                 _t1 = t - _halfT;
                 _tSqrd = _t1 * _t1;
+                // first cube up
                 _y[FIRST_CUBE] = _h[FIRST_CUBE] - Math.min(_y0[FIRST_CUBE] + _v0[FIRST_CUBE] * _t1 + 0.5 * _a1[FIRST_CUBE] * _tSqrd, _h[FIRST_CUBE]);
                 _destWidth[FIRST_CUBE] = _w[FIRST_CUBE] - Math.min(_destWidth0[FIRST_CUBE] + _destWidthV0[FIRST_CUBE] * _t1 + 0.5 * _a2[FIRST_CUBE] * _tSqrd, _w[FIRST_CUBE]);
-                
+                // second cube down
+                _y[SECOND_CUBE] = Math.min(_y0[SECOND_CUBE] + _v0[SECOND_CUBE] * _t1 + 0.5 * _a1[SECOND_CUBE] * _tSqrd, _h[SECOND_CUBE]);
+                _destWidth[SECOND_CUBE] = Math.min(_destWidth0[SECOND_CUBE] + _destWidthV0[SECOND_CUBE] * _t1 + 0.5 * _a2[SECOND_CUBE] * _tSqrd, _w[SECOND_CUBE]);
             }
             break;
         
         case (int)DIR_DOWN:
-            
+
+        	// first cube down
             _ratio1[FIRST_CUBE] = (_h[FIRST_CUBE] - _y[FIRST_CUBE]) / _h[FIRST_CUBE];
             _ratio2[FIRST_CUBE] = (_y[FIRST_CUBE]) / _h[FIRST_CUBE];
             
             _dx1[FIRST_CUBE] = _dy1[FIRST_CUBE] * (_destWidth[FIRST_CUBE]) / (2.0 * _h[FIRST_CUBE]);
             _dx2[FIRST_CUBE] = _dy2[FIRST_CUBE] * (_w[FIRST_CUBE] - _destWidth[FIRST_CUBE]) / (2.0 * _h[FIRST_CUBE]);
             _y1[FIRST_CUBE] = 0; _x1[FIRST_CUBE] = 0; _y2[FIRST_CUBE] = 0; _x2[FIRST_CUBE] = (_w[FIRST_CUBE] - _destWidth[FIRST_CUBE]) / 2.0;
+
+            // second cube up
+            _ratio1[SECOND_CUBE] = (_y[SECOND_CUBE]) / _h[SECOND_CUBE];
+            _ratio2[SECOND_CUBE] = (_h[SECOND_CUBE] - _y[SECOND_CUBE]) / _h[SECOND_CUBE];
             
+            _dx1[SECOND_CUBE] = _dy1[SECOND_CUBE] * (_w[SECOND_CUBE] - _destWidth[SECOND_CUBE]) / (2.0 * _h[SECOND_CUBE]);
+            _dx2[SECOND_CUBE] = _dy2[SECOND_CUBE] * (_destWidth[SECOND_CUBE]) / (2.0 * _h[SECOND_CUBE]);
+            _y1[SECOND_CUBE] = 0; _x1[SECOND_CUBE] = (_w[SECOND_CUBE] - _destWidth[SECOND_CUBE]) / 2.0; _y2[SECOND_CUBE] = 0; _x2[SECOND_CUBE] = 0;
+            
+            // first cube down
             for (; _y1[FIRST_CUBE] < _h[FIRST_CUBE]; _y1[FIRST_CUBE] += _dy1[FIRST_CUBE]) {
                 try {
                     _y2[FIRST_CUBE] = _y1[FIRST_CUBE];
@@ -449,29 +553,63 @@ public class DoubleCubicRotationTransition extends Transition {
                             , (int) (_w[FIRST_CUBE] - _x2[FIRST_CUBE] - _x2[FIRST_CUBE]), (int) _remainedSize[FIRST_CUBE]);
                 }
             }
-            
+            // second cube up
+            for (; _y1[SECOND_CUBE] < _h[SECOND_CUBE]; _y1[SECOND_CUBE] += _dy1[SECOND_CUBE]) {
+                try {
+                    gc.drawImage(to, 0, (int) _y1[SECOND_CUBE], _w[SECOND_CUBE], (int) _dy1[SECOND_CUBE]
+                            , (int) _x1[SECOND_CUBE], (int) (_y1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x1[SECOND_CUBE] - _x1[SECOND_CUBE]), (int) _dy1[SECOND_CUBE]);
+                    _x1[SECOND_CUBE] -= _dx1[SECOND_CUBE];
+                } catch (Exception e) {
+                    gc.drawImage(to, 0, (int) _y1[SECOND_CUBE], _w[SECOND_CUBE], (int) _remainedSize[SECOND_CUBE]
+                            , (int) _x1[SECOND_CUBE], (int) (_y1[SECOND_CUBE] * _ratio1[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x1[SECOND_CUBE] - _x1[SECOND_CUBE]), (int) _remainedSize[SECOND_CUBE]);
+                }
+            }
+            for (; _y2[SECOND_CUBE] < _h[SECOND_CUBE]; _y2[SECOND_CUBE] += _dy2[SECOND_CUBE]) {
+                try {
+                    gc.drawImage(from, 0, (int) _y2[SECOND_CUBE], _w[SECOND_CUBE], (int) _dy2[SECOND_CUBE]
+                            , (int) _x2[SECOND_CUBE], (int) (_y[SECOND_CUBE] + _y2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x2[SECOND_CUBE] - _x2[SECOND_CUBE]), (int) _dy2[SECOND_CUBE]);
+                    _x2[SECOND_CUBE] += _dx2[SECOND_CUBE];
+                } catch (Exception e) {
+                    gc.drawImage(from, 0, (int) _y2[SECOND_CUBE], _w[SECOND_CUBE], (int) _remainedSize[SECOND_CUBE]
+                            , (int) _x2[SECOND_CUBE], (int) (_y[SECOND_CUBE] + _y2[SECOND_CUBE] * _ratio2[SECOND_CUBE]) + _h[FIRST_CUBE]
+                            , (int) (_w[SECOND_CUBE] - _x2[SECOND_CUBE] - _x2[SECOND_CUBE]), (int) _remainedSize[SECOND_CUBE]);
+                }
+            }
+
             if( t <= _halfT ) {
-                
                 _tSqrd = t * t;
+                // first cube down
                 _y[FIRST_CUBE] = Math.min(0.5 * _a1[FIRST_CUBE] * _tSqrd, _halfH[FIRST_CUBE]);
                 _destWidth[FIRST_CUBE] = Math.min(0.5 * _a2[FIRST_CUBE] * _tSqrd, _halfW[FIRST_CUBE]);
-                
+                // second cube up
+                _y[SECOND_CUBE] = _h[SECOND_CUBE] - Math.min(0.5 * _a1[SECOND_CUBE] * _tSqrd, _halfH[SECOND_CUBE]);
+                _destWidth[SECOND_CUBE] = _w[SECOND_CUBE] - Math.min(0.5 * _a2[SECOND_CUBE] * _tSqrd, _halfW[SECOND_CUBE]);
             } else {
                 
                 if(!_flag1) {
-                    
+                	// first cube down
                     _y0[FIRST_CUBE] = _y[FIRST_CUBE]; _destWidth0[FIRST_CUBE] = _destWidth[FIRST_CUBE];
                     _v0[FIRST_CUBE] = _a1[FIRST_CUBE] * t; _destWidthV0[FIRST_CUBE] = _a2[FIRST_CUBE] * t;
                     _a1[FIRST_CUBE] *= -1.0; _a2[FIRST_CUBE] *= -1.0;
-                    _flag1 = true;
+                    // second cube up
+                    _y0[SECOND_CUBE] = _h[SECOND_CUBE] - _y[SECOND_CUBE]; _destWidth0[SECOND_CUBE] = _w[SECOND_CUBE] - _destWidth[SECOND_CUBE];
+                    _v0[SECOND_CUBE] = _a1[SECOND_CUBE] * t; _destWidthV0[SECOND_CUBE] = _a2[SECOND_CUBE] * t;
+                    _a1[SECOND_CUBE] *= -1.0; _a2[SECOND_CUBE] *= -1.0;
                     
+                    _flag1 = true;
                 }
                 
                 _t1 = t - _halfT;
                 _tSqrd = _t1 * _t1;
+                // first cube down
                 _y[FIRST_CUBE] = Math.min(_y0[FIRST_CUBE] + _v0[FIRST_CUBE] * _t1 + 0.5 * _a1[FIRST_CUBE] * _tSqrd, _h[FIRST_CUBE]);
                 _destWidth[FIRST_CUBE] = Math.min(_destWidth0[FIRST_CUBE] + _destWidthV0[FIRST_CUBE] * _t1 + 0.5 * _a2[FIRST_CUBE] * _tSqrd, _w[FIRST_CUBE]);
-                
+                // second cube up
+                _y[SECOND_CUBE] = _h[SECOND_CUBE] - Math.min(_y0[SECOND_CUBE] + _v0[SECOND_CUBE] * _t1 + 0.5 * _a1[SECOND_CUBE] * _tSqrd, _h[SECOND_CUBE]);
+                _destWidth[SECOND_CUBE] = _w[SECOND_CUBE] - Math.min(_destWidth0[SECOND_CUBE] + _destWidthV0[SECOND_CUBE] * _t1 + 0.5 * _a2[SECOND_CUBE] * _tSqrd, _w[SECOND_CUBE]);
             }
             break;
         
