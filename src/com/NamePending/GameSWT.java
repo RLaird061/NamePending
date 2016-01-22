@@ -36,7 +36,7 @@ public class GameSWT extends Composite
 			}
 			public void keyPressed(KeyEvent e) {
 				// Handle ARROW keys and SWAP(space)
-				System.out.println(e.toString());
+				//System.out.println(e.toString());
 				Point p = gamecomp.getSelector();
 				int selX = p.x;
 				int selY = p.y;

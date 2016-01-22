@@ -3,7 +3,8 @@ package com.NamePending;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import com.NamePending.piece.NullPiece;
+import org.eclipse.swt.graphics.Rectangle;
+
 import com.NamePending.piece.Piece;
 import com.NamePending.piece.StandardPiece;
 
@@ -12,6 +13,7 @@ public class GameBoard {
 	private static final int MARK_NONE = 0;
 	private static final int MARK_TOREMOVE = 1;
 	private static final int MARK_GETNEWPIECEFROMBELOW = 2;
+	private static final int MARK_GETNEWPIECEIMAGE = 3;
 	
 	// Member Variable
 	private ArrayList<Piece> board = new ArrayList<Piece>();
@@ -25,7 +27,7 @@ public class GameBoard {
 		boardWidth = w;
 		boardHeight = h;
 		for (int i = 0; i < w * h; i++) {
-			board.add(new NullPiece());
+			board.add(Piece.pieces.get(0) /* NullPiece */);
 			marker.add(new Integer(MARK_NONE));
 		}
 		// temp
@@ -70,7 +72,8 @@ public class GameBoard {
 		t1.setPieceImage(p1.getImage());
 		t2.setPieceImage(p2.getImage());
 		
-		solver();
+		// TODO: track "chained" moves somehow
+		while(solver() > 0);
 	}
 	
 	// solver is the meat of the game; any 3 or more pieces in a row will score/disappear
@@ -81,8 +84,93 @@ public class GameBoard {
 	{
 		int ret = solverMarkToRemove();
 		solverRemovePieces();
-		//solverMovePiecesFromBelow();
+		solverMovePiecesFromBelow();
+		solverDoSlideUp();
+
+		// TODO: remove testing index output code below
+//		for (int y = 0; y < GameSWT.PIECES_PER_COL; y++) {
+//			for (int x = 0; x < GameSWT.PIECES_PER_ROW; x++) {
+//				System.out.printf("%d ", Piece.getPieceIndex(board.get(y * GameSWT.PIECES_PER_ROW + x)));
+//			}
+//			System.out.printf("\n");
+//		}
 		return ret;
+	}
+	
+	private void solverDoSlideUp()
+	{
+		TransitionableCanvas t0 = (TransitionableCanvas) gameComposite.lbls.get(0);
+		ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
+		ArrayList<Integer> heights = new ArrayList<Integer>();
+		int x, y, tmpy;
+		for (x = 0; x < GameSWT.PIECES_PER_ROW; x++) {
+			tmpy = -1;
+			int h = 0;
+			for (y = 0; y < GameSWT.PIECES_PER_COL; y++) {
+				int idx = y * GameSWT.PIECES_PER_ROW + x;
+				int mark = marker.get(idx);
+				if (tmpy == -1 && mark == MARK_TOREMOVE) {
+					tmpy = y;
+					h++;
+				} else if (mark == MARK_TOREMOVE) {
+					h++;
+				}
+			}
+			if (tmpy != -1 && tmpy < GameSWT.PIECES_PER_COL) {
+				// found a column to move up.. so make a rect
+				Rectangle r = new Rectangle(
+						x * GameSWT.PIECE_LENGTH,
+						tmpy * GameSWT.PIECE_LENGTH,
+						GameSWT.PIECE_LENGTH,
+						(GameSWT.PIECES_PER_COL-tmpy) * GameSWT.PIECE_LENGTH);
+				rects.add(r);
+				heights.add(h);
+			}
+		}
+		
+		t0.doSlideUpAnimStep1(rects, heights);
+		for (int i = 0; i < board.size(); i++) {
+			marker.set(i, MARK_NONE);
+			((TransitionableCanvas) gameComposite.lbls.get(i)).setPieceImage(get(i).getImage());		
+		}
+		t0.doSlideUpAnimStep2();		
+	}
+	
+	private void solverMovePiecesFromBelow()
+	{
+		for (int x = 0; x < GameSWT.PIECES_PER_ROW; x++)
+		{
+			for (int y = 0; y < GameSWT.PIECES_PER_COL; y++)
+			{   // go col by col
+				int i = y * GameSWT.PIECES_PER_ROW + x;
+
+				int tmpx = x;
+				int tmpy = y;
+				boolean found = false;
+				int mark = marker.get(i);
+				if (mark == MARK_GETNEWPIECEFROMBELOW || mark == MARK_TOREMOVE) {
+					// go down looking for a piece below if found move it up here
+					for (; tmpy < GameSWT.PIECES_PER_COL && !found; tmpy++) {
+						int tmpi = tmpy * GameSWT.PIECES_PER_ROW + tmpx;
+						if (marker.get(tmpi) != MARK_GETNEWPIECEFROMBELOW && marker.get(tmpi) != MARK_TOREMOVE) {
+							set(i, get(tmpi)); // move piece up
+							set(tmpi, Piece.pieces.get(0) /* NullPiece */);
+							
+							marker.set(tmpi, MARK_GETNEWPIECEFROMBELOW);
+							found = true;
+						}
+					}
+					if (!found) {
+						// if not found make a new random piece
+						int rnd = (int) (Math.random() * StandardPiece.pieces.size());
+						board.set(i, StandardPiece.pieces.get(rnd));						
+						
+						if (marker.get(i) != MARK_TOREMOVE)
+							marker.set(i, MARK_GETNEWPIECEIMAGE);
+					}
+				}
+			}
+		}
 	}
 	
 	private void solverRemovePieces()
@@ -92,10 +180,8 @@ public class GameBoard {
 			TransitionableCanvas t = (TransitionableCanvas) gameComposite.lbls.get(i);
 			
 			if (marker.get(i) == MARK_TOREMOVE) {
-				set(i, new NullPiece());
-				t.setPieceImage(null);
-				marker.set(i, MARK_GETNEWPIECEFROMBELOW);
-				//marker.set(i, MARK_NONE);
+				set(i, Piece.pieces.get(0) /* NullPiece */);
+				t.setPieceImage(get(i).getImage());
 			}
 		}
 	}

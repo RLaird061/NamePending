@@ -1,5 +1,8 @@
 package com.NamePending;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.eclipse.nebula.effects.stw.Transition;
 import org.eclipse.nebula.effects.stw.TransitionListener;
 import org.eclipse.nebula.effects.stw.TransitionManager;
@@ -16,6 +19,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -35,6 +39,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	private FadeTransition ft = null;
 	private CubicRotationTransition ct = null;
 	private DoubleCubicRotationTransition dct = null;
+	private MultiSlideUpTransition msut = null; // Don't use for swaps!
 	
 	public TransitionableCanvas(Composite parent, int style, int idx) {
 		super(parent, style);
@@ -46,11 +51,14 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 					System.out.println("done");
 					// TODO: prevent any other keyboard input and/or transitions before we are done
 					// because accepting them causes strange bugs that are gunna be super stupid to debug
-					neighbor.setVisible(true); // neighbor back to visible
-					Point p = neighbor.getSize();
-					setSize(p.x, p.y);         // size back to normal
+					for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+						TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
+						tc.setVisible(true);
+					}
+					setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
 					// copy back proper piece after transition effect
-					pieceImage = new Image(MainSWT.getDisplay(), tempImage, SWT.IMAGE_COPY);
+					if (tempImage != null)
+						pieceImage = new Image(MainSWT.getDisplay(), tempImage, SWT.IMAGE_COPY);
 				}
 			});
 		}
@@ -142,7 +150,85 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		tm.setTransition(dct);
 		tm.startTransition(0, 0, getDirection(0,0));
 	}
+	
+	public void doSlideUpAnimStep1(ArrayList<Rectangle> rects, ArrayList<Integer> heights)
+	{
+		msut = new MultiSlideUpTransition(tm, 60, 500, rects, heights); // setup timing and rects and heights
 
+		// Temporary expand this piece to take up whole game board
+		// then slide all columns (defined in rects) up
+		tempImage = new Image(MainSWT.getDisplay(), pieceImage, SWT.IMAGE_COPY);
+		int w = GameSWT.PIECES_PER_ROW * GameSWT.PIECE_LENGTH;
+		int h = GameSWT.PIECES_PER_COL * GameSWT.PIECE_LENGTH;
+		setSize(w, h);
+		ImageData data = new ImageData(w, h, getPieceImage().getImageData().depth, getPieceImage().getImageData().palette); 
+		int[] pixels = new int[GameSWT.PIECE_LENGTH];
+		byte[] alphas = new byte[GameSWT.PIECE_LENGTH];
+		
+		// draw all pieces into this data
+		for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+			int _x = idx % GameSWT.PIECES_PER_ROW;
+			int _y = idx / GameSWT.PIECES_PER_ROW;
+			TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
+			if (idx > 0)
+				tc.setVisible(false);
+			
+			int x = _x * GameSWT.PIECE_LENGTH;
+			int y = _y * GameSWT.PIECE_LENGTH;
+
+			Image pi = tc.getPieceImage();
+			if (pi != null) {
+				ImageData tmp = tc.getPieceImage().getImageData();
+				for (int tmpy = 0; tmpy < GameSWT.PIECE_LENGTH; tmpy++) {
+					tmp.getPixels(0, tmpy, GameSWT.PIECE_LENGTH, pixels, 0);
+					tmp.getAlphas(0, tmpy, GameSWT.PIECE_LENGTH, alphas, 0);
+					data.setPixels(x, y+tmpy, GameSWT.PIECE_LENGTH, pixels, 0);
+					data.setAlphas(x, y+tmpy, GameSWT.PIECE_LENGTH, alphas, 0);				
+				}
+			} else {
+				for (int tmpy = 0; tmpy < GameSWT.PIECE_LENGTH; tmpy++) {
+					Arrays.fill(pixels, (int) 0); 
+					Arrays.fill(alphas, (byte) 0);
+					data.setPixels(x, y+tmpy, GameSWT.PIECE_LENGTH, pixels, 0);
+					data.setAlphas(x, y+tmpy, GameSWT.PIECE_LENGTH, alphas, 0);				
+				}
+			}
+		}
+		oldImage = new Image(MainSWT.getDisplay(), data);
+	}
+
+	public void doSlideUpAnimStep2()
+	{
+		int w = GameSWT.PIECES_PER_ROW * GameSWT.PIECE_LENGTH;
+		int h = GameSWT.PIECES_PER_COL * GameSWT.PIECE_LENGTH;
+		ImageData data = new ImageData(w, h, pieceImage.getImageData().depth, pieceImage.getImageData().palette); 
+		int[] pixels = new int[GameSWT.PIECE_LENGTH];
+		byte[] alphas = new byte[GameSWT.PIECE_LENGTH];
+		
+		// draw all pieces into this data
+		for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+			int _x = idx % GameSWT.PIECES_PER_ROW;
+			int _y = idx / GameSWT.PIECES_PER_ROW;
+			TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
+			if (idx > 0)
+				tc.setVisible(false);
+			
+			int x = _x * GameSWT.PIECE_LENGTH;
+			int y = _y * GameSWT.PIECE_LENGTH;
+			
+			for (int tmpy = 0; tmpy < GameSWT.PIECE_LENGTH; tmpy++) {
+				tc.getPieceImage().getImageData().getPixels(0, tmpy, GameSWT.PIECE_LENGTH, pixels, 0);
+				tc.getPieceImage().getImageData().getAlphas(0, tmpy, GameSWT.PIECE_LENGTH, alphas, 0);
+				data.setPixels(x, y+tmpy, GameSWT.PIECE_LENGTH, pixels, 0);
+				data.setAlphas(x, y+tmpy, GameSWT.PIECE_LENGTH, alphas, 0);				
+			}
+		}
+		pieceImage = new Image(MainSWT.getDisplay(), data);
+		
+		tm.setTransition(msut);
+		tm.startTransition(0, 0, Transition.DIR_UP);		
+	}
+	
 	@Override
 	protected void checkSubclass() {}
 

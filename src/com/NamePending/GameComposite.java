@@ -41,7 +41,7 @@ public class GameComposite extends Composite {
 		
 		addPaintListener(new PaintListener()  { /* paint listener. */
 			public void paintControl(final PaintEvent event) {
-				System.out.println("painting");
+				//System.out.println("painting");
 				if (backgroundImage != null)
 				{
 					event.gc.drawImage(backgroundImage, 0, 0);
