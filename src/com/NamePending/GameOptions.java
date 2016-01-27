@@ -11,10 +11,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
 public class GameOptions extends JFrame {
 	public GameOptions() {
-		this.setSize(350, 300);
+		this.setSize(350, 305);
 		this.setResizable(false);
 		getContentPane().setLayout(null);
 
@@ -72,7 +73,7 @@ public class GameOptions extends JFrame {
 //				MainSWT.gameFrame.setUndecorated(true);
 			}
 		});
-		btnOk.setBounds(50, 227, 89, 23);
+		btnOk.setBounds(45, 224, 89, 23);
 		getContentPane().add(btnOk);
 
 		JButton btnCancel = new JButton("Cancel");
@@ -82,7 +83,7 @@ public class GameOptions extends JFrame {
 				dispose();
 			}
 		});
-		btnCancel.setBounds(189, 227, 89, 23);
+		btnCancel.setBounds(184, 224, 89, 23);
 		getContentPane().add(btnCancel);
 	}
 }

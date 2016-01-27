@@ -11,6 +11,14 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 public class GameSWT extends Composite
 {
@@ -26,6 +34,8 @@ public class GameSWT extends Composite
 	// Member Variables
 	private GameBoard gameboard;    // holds game logic
 	private GameComposite gamecomp; // game drawing
+	private Label lblScore;
+	private Text txtName;
 
 	// Member Functions
 	public GameSWT(Composite parent, int style) {
@@ -56,14 +66,57 @@ public class GameSWT extends Composite
 			}
 		});
 
-		setSize(BORDER_WIDTH*2 + PIECES_PER_ROW*PIECE_LENGTH, 
+		setSize(BORDER_WIDTH*2 + PIECES_PER_ROW*PIECE_LENGTH + 300, 
 				BORDER_WIDTH*2 + PIECES_PER_COL*PIECE_LENGTH);
 		
-		gamecomp = new GameComposite(this, SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED);
+		gamecomp = new GameComposite(this, SWT.DOUBLE_BUFFERED);
 		gamecomp.setSelector(new Point(0,0)); // start selector at top left
 		gameboard = new GameBoard(PIECES_PER_ROW, PIECES_PER_COL);
 		gameboard.setComposite(gamecomp);
 		
+		txtName = new Text(gamecomp, SWT.BORDER);
+		txtName.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				if (txtName.getText().length() > 3)
+					txtName.setText(txtName.getText().substring(0, 3));
+			}
+		});
+		txtName.setFont(SWTResourceManager.getFont("Arial", 16, SWT.BOLD));
+		txtName.setBounds(380, 10, 125, 30);
+		
+		lblScore = new Label(gamecomp, SWT.CENTER);
+		lblScore.setFont(SWTResourceManager.getFont("Arial", 16, SWT.BOLD));
+		lblScore.setBounds(380, 50, 125, 30);
+		lblScore.setText("0");
+		
+		// TODO: remove me!
+		Button btnGameover = new Button(gamecomp, SWT.NONE);
+		btnGameover.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				GameDatabase db = new GameDatabase();
+				try {
+					int score = Integer.parseInt(lblScore.getText());
+					db.writeDataBase(txtName.getText(), score);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}				
+			}
+		});
+		btnGameover.setBounds(430, 381, 75, 25);
+		btnGameover.setText("GameOver");
+		
 		setFocus();
+	}
+	
+	public void changeScore(int score) {
+		String str = String.format("%d", score);
+		lblScore.setText(str);
+	}
+	
+	public void addToScore(int score) {
+		int prev = Integer.parseInt(lblScore.getText());
+		String str = String.format("%d", score+prev);
+		lblScore.setText(str);
 	}
 }

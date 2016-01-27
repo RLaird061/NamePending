@@ -72,8 +72,17 @@ public class GameBoard {
 		t1.setPieceImage(p1.getImage());
 		t2.setPieceImage(p2.getImage());
 		
-		// TODO: track "chained" moves somehow
-		while(solver() > 0);
+		// track "chained" moves somehow
+		int score = 0;
+		int acc_score = 0;
+		do {
+			score = solver();
+			acc_score += score;
+		} while(score > 0);
+		
+		if (acc_score > 0) {
+			MainSWT.getGameFrame().addToScore(acc_score);
+		}
 	}
 	
 	// solver is the meat of the game; any 3 or more pieces in a row will score/disappear
