@@ -97,7 +97,7 @@ public class GameSWT extends Composite
 				GameDatabase db = new GameDatabase();
 				try {
 					int score = Integer.parseInt(lblScore.getText());
-					db.writeDataBase(txtName.getText(), score);
+					db.writeHighScore(txtName.getText(), score);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}				

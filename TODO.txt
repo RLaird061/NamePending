@@ -1,11 +1,7 @@
-- game logic
-  - piece removal and scoring
-  - piece removal replacement
-  - piece removal animation
 
 - options
- - persistant options (either in file or database)
- - fullscreen (not maximized)
+  - persistant options (either in file or database)
+  - fullscreen (not maximized)
 
 - game over screen
 
@@ -17,12 +13,36 @@
 
 - sliding/something(transition wise) BACKGROUND IMAGE (night and day or something)
 
-- high score (DATABASE)
+- flicker problem??
 
+- name??
 
+- graphics:
+  - intro screen
 
+- change keymapping with options
+
+- input buffer ... enter keys faster!
+
+- fix First Piece disappear bug!
+
+- selection moving to first piece bug!
 
 
 DONE:
+- game logic:
   - swapping
   - swap animation
+  - piece removal and scoring
+  - piece removal replacement
+  - piece removal animation
+
+- high score (DATABASE)
+
+- graphics:
+  - balloons
+
+
+
+
+

@@ -1,20 +1,27 @@
 package com.NamePending;
 
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
+import javax.swing.JSlider;
 
 public class GameOptions extends JFrame {
 	public GameOptions() {
+		
+		int optFullScreen = -1;
+		
+		GameDatabase db = new GameDatabase();
+		try {
+			optFullScreen = db.readOptions("FullScreen", 0);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
 		this.setSize(350, 305);
 		this.setResizable(false);
 		getContentPane().setLayout(null);
@@ -36,7 +43,11 @@ public class GameOptions extends JFrame {
 		ButtonGroup winSize = new ButtonGroup();
 		winSize.add(rdbtnFullscreen);
 		winSize.add(rdbtnWindowed);
-		rdbtnWindowed.setSelected(true);
+		
+		if (optFullScreen == 0)
+			rdbtnWindowed.setSelected(true);
+		else if (optFullScreen == 1)
+			rdbtnFullscreen.setSelected(true);
 
 		// TODO: get some music all up in here
 		JLabel lblSounds = new JLabel("Sounds:");
@@ -71,6 +82,19 @@ public class GameOptions extends JFrame {
 //					MainSWT.gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 //				MainSWT.gameFrame.setVisible(true);
 //				MainSWT.gameFrame.setUndecorated(true);
+
+				GameDatabase db = new GameDatabase();
+
+				try {
+					if (rdbtnWindowed.isSelected())							
+						db.writeOptions("FullScreen", 0);
+					else 
+						db.writeOptions("FullScreen", 1);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+				dispose();
 			}
 		});
 		btnOk.setBounds(45, 224, 89, 23);

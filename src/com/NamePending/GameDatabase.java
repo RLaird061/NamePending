@@ -14,7 +14,112 @@ public class GameDatabase {
 	private ResultSet resultSet = null;
 	private String databaseFile;
 
-	public void writeDataBase(String name, int score) throws Exception {
+	public void writeOptions(String key, int value) throws Exception {
+		try {
+			String current = new java.io.File( "." ).getCanonicalPath();
+			databaseFile = current + "\\game.db";
+
+			// Setup the connection with the DB
+			connect = DriverManager
+					.getConnection("jdbc:sqlite://" +
+							   databaseFile);
+			// Statements allow to issue SQL queries to the database
+			String tmpValue = String.format("%d", value);
+			preparedStatement = connect
+					.prepareStatement("UPDATE options SET " + key +
+							"=" + tmpValue +
+							" WHERE " + key + "!=" + tmpValue);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("Database connection errror");
+			throw e;
+		} finally {
+			close();
+		}
+	}
+	
+	public void writeOptions(String key, String value) throws Exception {
+		try {
+			String current = new java.io.File( "." ).getCanonicalPath();
+			databaseFile = current + "\\game.db";
+
+			// Setup the connection with the DB
+			connect = DriverManager
+					.getConnection("jdbc:sqlite://" +
+							   databaseFile);
+			// Statements allow to issue SQL queries to the database
+			preparedStatement = connect
+					.prepareStatement("UPDATE options SET " + key +
+							"=" + value +
+							" WHERE " + key + "!=" + value);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("Database connection errror");
+			throw e;
+		} finally {
+			close();
+		}		
+	}
+	
+	public int readOptions(String key, int i) throws Exception {
+		try {
+			String current = new java.io.File( "." ).getCanonicalPath();
+			databaseFile = current + "\\game.db";
+
+			// Setup the connection with the DB
+			connect = DriverManager
+					.getConnection("jdbc:sqlite://" +
+							   databaseFile);
+
+			// Statements allow to issue SQL queries to the database
+			statement = connect.createStatement();
+			// Result set get the result of the SQL query
+			resultSet = statement
+					.executeQuery("select * from options");
+			while (resultSet.next()) {
+				Integer value = resultSet.getInt(key);
+				return value;
+			}
+
+		} catch (Exception e) {
+			System.out.println("Database connection errror");
+			throw e;
+		} finally {
+			close();
+		}		
+		return -1; /* make sure -1 is always and error */
+	}
+	
+	public String readOptions(String key) throws Exception {
+		try {
+			String current = new java.io.File( "." ).getCanonicalPath();
+			databaseFile = current + "\\game.db";
+
+			// Setup the connection with the DB
+			connect = DriverManager
+					.getConnection("jdbc:sqlite://" +
+							   databaseFile);
+
+			// Statements allow to issue SQL queries to the database
+			statement = connect.createStatement();
+			// Result set get the result of the SQL query
+			resultSet = statement
+					.executeQuery("select * from options");
+			while (resultSet.next()) {
+				String value = resultSet.getString(key);
+				return value;
+			}
+
+		} catch (Exception e) {
+			System.out.println("Database connection errror");
+			throw e;
+		} finally {
+			close();
+		}		
+		return ""; /* make sure empty string is always and error */		
+	}
+	
+	public void writeHighScore(String name, int score) throws Exception {
 		try {
 			String current = new java.io.File( "." ).getCanonicalPath();
 			databaseFile = current + "\\game.db";
@@ -38,7 +143,7 @@ public class GameDatabase {
 		}		
 	}
 	
-	public void readDataBase() throws Exception {
+	public void readHighScore() throws Exception {
 		try {
 			String current = new java.io.File( "." ).getCanonicalPath();
 			databaseFile = current + "\\game.db";
