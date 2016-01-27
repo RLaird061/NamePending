@@ -12,7 +12,7 @@ public class BlueMetalPiece extends StandardPiece
     {
         super(new Color(42, 42, 255), 
 				new Image(MainSWT.getDisplay(), SWTResourceManager.getImage(
-						MainSWT.class, "/com/NamePending/res/BlueMetalPiece.png")
+						MainSWT.class, "/com/NamePending/res/PurpleBalloon.png")
 						.getImageData()));
     }
 }

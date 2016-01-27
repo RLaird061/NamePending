@@ -59,7 +59,7 @@ public class GameSWT extends Composite
 		setSize(BORDER_WIDTH*2 + PIECES_PER_ROW*PIECE_LENGTH, 
 				BORDER_WIDTH*2 + PIECES_PER_COL*PIECE_LENGTH);
 		
-		gamecomp = new GameComposite(this, SWT.DOUBLE_BUFFERED);
+		gamecomp = new GameComposite(this, SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED);
 		gamecomp.setSelector(new Point(0,0)); // start selector at top left
 		gameboard = new GameBoard(PIECES_PER_ROW, PIECES_PER_COL);
 		gameboard.setComposite(gamecomp);

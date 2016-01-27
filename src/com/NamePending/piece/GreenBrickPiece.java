@@ -12,7 +12,7 @@ public class GreenBrickPiece extends StandardPiece
     {
         super(new Color(42, 255, 42), 
 				new Image(MainSWT.getDisplay(), SWTResourceManager.getImage(
-						MainSWT.class, "/com/NamePending/res/GreenBrickPiece.png")
+						MainSWT.class, "/com/NamePending/res/GreenBalloon.png")
 						.getImageData()));
     }
 }
