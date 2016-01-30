@@ -29,7 +29,7 @@ public class GameComposite extends Composite {
 		{
 			for (int x = 0; x < GameSWT.PIECES_PER_ROW; x++)
 			{
-				TransitionableCanvas tl = new TransitionableCanvas(this, SWT.NONE, y * GameSWT.PIECES_PER_ROW + x);
+				TransitionableCanvas tl = new TransitionableCanvas(this, SWT.DOUBLE_BUFFERED, y * GameSWT.PIECES_PER_ROW + x);
 				lbls.add(tl);
 				tl.setBounds(xPos, yPos, GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);
 				xPos += GameSWT.PIECE_LENGTH;

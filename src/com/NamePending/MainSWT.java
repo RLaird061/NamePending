@@ -73,7 +73,7 @@ public class MainSWT {
 				
 				// TODO: move all this to a seperate process???
 				Shell gameShell = new Shell(display, SWT.NONE);
-				gameFrame = new GameSWT(gameShell, SWT.NONE); // TODO: put in center? params useless?
+				gameFrame = new GameSWT(gameShell, SWT.DOUBLE_BUFFERED); // TODO: put in center? params useless?
 				gameShell.setLocation(shell.getBounds().x, shell.getBounds().y);
 				gameShell.pack();
 				gameShell.open();

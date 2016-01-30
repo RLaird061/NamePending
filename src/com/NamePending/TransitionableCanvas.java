@@ -30,6 +30,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	public static final int SELECTED_LEFT = 2;   // has left part of selector
 	private int index;
 	private int selected = NOT_SELECTED;
+	private static int selected_idx = -1;
 	private Image pieceImage;
 	private Image oldImage;
 	private Image tempImage;
@@ -49,16 +50,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 			tm.addTransitionListener(new TransitionListener() {
 				public void transitionFinished(TransitionManager tm) {
 					System.out.println("done");
-					// TODO: prevent any other keyboard input and/or transitions before we are done
-					// because accepting them causes strange bugs that are gunna be super stupid to debug
-					for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
-						TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
-						tc.setVisible(true);
-					}
-					setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
-					// copy back proper piece after transition effect
-					if (tempImage != null)
-						pieceImage = new Image(MainSWT.getDisplay(), tempImage, SWT.IMAGE_COPY);
+					transitionDone();
 				}
 			});
 		}
@@ -70,16 +62,20 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		addPaintListener(new PaintListener()  { /* paint listener. */
 			public void paintControl(final PaintEvent event) {
 				if (pieceImage != null) {
+					int xPos = selected_idx % GameSWT.PIECES_PER_ROW;
+					int yPos = selected_idx / GameSWT.PIECES_PER_COL;
+					xPos *= GameSWT.PIECE_LENGTH;
+					yPos *= GameSWT.PIECE_LENGTH;
 					if (oldImage != null) {
 						event.gc.drawImage(oldImage, 0, 0);
-						drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), 0, 0,
+						drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), xPos, yPos,
 								GameSWT.SELECTOR_WIDTH, GameSWT.SELECTOR_HEIGHT, 25, true);						
 						oldImage = null;
 					} else {
 						event.gc.drawImage(pieceImage, 0, 0);
 						Point p = getSize();
 						if (p.x > GameSWT.PIECE_LENGTH)
-							drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), 0, 0,
+							drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), xPos, yPos,
 									GameSWT.SELECTOR_WIDTH, GameSWT.SELECTOR_HEIGHT, 25, true);						
 					}
 				}
@@ -94,8 +90,23 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		});
 	}
 
+	public void transitionDone() {
+		// TODO: prevent any other keyboard input and/or transitions before we are done
+		// because accepting them causes strange bugs that are gunna be super stupid to debug
+		for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+			TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
+			tc.setVisible(true);
+		}
+		setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
+		// copy back proper piece after transition effect
+		if (tempImage != null)
+			pieceImage = new Image(MainSWT.getDisplay(), tempImage, SWT.IMAGE_COPY);
+	}
+	
 	public void setSelector(int selected_side) {
 		selected = selected_side;
+		if (selected == SELECTED_LEFT)
+			selected_idx = index;
 	}
 	
 	public Image getPieceImage() {
@@ -147,8 +158,15 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}		
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 		
-		tm.setTransition(dct);
-		tm.startTransition(0, 0, getDirection(0,0));
+		
+		GC gc = new GC(this, SWT.NONE);
+		dct.start(oldImage, pieceImage, gc, getDirection(0,0));
+		gc.dispose();
+		
+		
+		transitionDone();
+//		tm.setTransition(dct);
+//		tm.startTransition(0, 0, getDirection(0,0));
 	}
 	
 	public void doSlideUpAnimStep1(ArrayList<Rectangle> rects, ArrayList<Integer> heights)
@@ -225,8 +243,13 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 		
-		tm.setTransition(msut);
-		tm.startTransition(0, 0, Transition.DIR_UP);		
+		GC gc = new GC(this, SWT.DOUBLE_BUFFERED);
+		msut.start(oldImage, pieceImage, gc, getDirection(0,0));
+		gc.dispose();
+		
+		transitionDone();
+//		tm.setTransition(msut);
+//		tm.startTransition(0, 0, Transition.DIR_UP);		
 	}
 	
 	@Override

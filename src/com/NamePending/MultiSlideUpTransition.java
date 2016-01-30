@@ -1,6 +1,7 @@
 package com.NamePending;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*******************************************************************************
  * Copyright (c) 2010 Ahmed Mahran and others.
@@ -37,6 +38,7 @@ public class MultiSlideUpTransition extends org.eclipse.nebula.effects.stw.Trans
     private Image _from[];
     private Image _to[];    
     private long _halfT, _t1;
+    private ArrayList<Rectangle> inverted_rects;
     private ArrayList<Rectangle> rects;
     private ArrayList<Integer> heights;
     
@@ -65,6 +67,24 @@ public class MultiSlideUpTransition extends org.eclipse.nebula.effects.stw.Trans
         super(transitionManager, fps, T);
         this.rects = rects;
         this.heights = heights;
+        
+        // very game specific way of inverting a list of rects TODO: fix me
+        inverted_rects = new ArrayList<Rectangle>();
+        for (int x = 0; x < GameSWT.PIECES_PER_ROW; x++)
+        {
+        	boolean intersects = false;
+        	int h = GameSWT.PIECES_PER_COL * GameSWT.PIECE_LENGTH;
+        	Rectangle r = new Rectangle(x * GameSWT.PIECE_LENGTH, 0,
+        			GameSWT.PIECE_LENGTH, h);
+        	
+        	for (int i = 0; i < rects.size(); i++) {
+        		if (rects.get(i).intersects(r)) {
+        			intersects = true;
+        			r.height = rects.get(i).y;
+        		}
+        	}
+        	inverted_rects.add(r);
+        }
     }
     
     @Override
@@ -98,7 +118,7 @@ public class MultiSlideUpTransition extends org.eclipse.nebula.effects.stw.Trans
         		df.getAlphas(r.x, y, r.width, alphas, 0);
         		_fromData.setPixels(0, y-r.y, r.width, pixels, 0);
         		_fromData.setAlphas(0, y-r.y, r.width, alphas, 0);
-
+        		
         		dt.getPixels(r.x, y, r.width, pixels, 0);
         		dt.getAlphas(r.x, y, r.width, alphas, 0); 
         		_toData.setPixels(0, y-r.y, r.width, pixels, 0);
@@ -119,16 +139,19 @@ public class MultiSlideUpTransition extends org.eclipse.nebula.effects.stw.Trans
 
     @Override
     protected void stepTransition(long t, Image from, Image to, GC gc, double direction) {
-    	
-    	gc.drawImage(from, 0, 0);
+    	// draw non-moving parts first
+    	for (int i = 0; i < inverted_rects.size(); i++) {
+    		Rectangle r = inverted_rects.get(i);
+    		gc.drawImage(from, r.x, r.y, r.width, r.height, r.x, r.y, r.width, r.height);
+    	}
     	// draw
     	for (int i = 0; i < rects.size(); i++) {
     		Rectangle r = rects.get(i);
-    		gc.setClipping(r); // clip top off
+    		
+    		// draw moving rects
+    		//gc.setClipping(r); // this causes a weird bug... not sure why!
     		gc.drawImage(_from[i], (int)_x[i], r.y + (int)_y[i]);
     		gc.drawImage(_to[i], (int)_x[i], r.y + (int)(_y[i] + _h[i]));
-//    		gc.drawImage(_to[i], 0, 0, r.width, r.height - (int)(_y[i] + _h[i])
-//    				, (int)_x[i], r.y + (int)(_y[i] + _h[i]), r.width, r.height - (int)(_y[i] + _h[i]));
 
     		if( t <= _halfT ) {
     			_y[i] = Math.max(-0.5 * _a[i] * t * t, -_halfH[i]);
