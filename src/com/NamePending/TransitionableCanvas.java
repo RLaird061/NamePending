@@ -288,7 +288,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	private void drawOutlineRect(GC gc, Color color, int x, int y, int width, int height, int opacity, boolean bothsides)
 	{
 		// draw an entire background color with some alpha/opacity
-		gc.setBackground(new Color(MainSWT.getDisplay(), color.getRed(), color.getGreen(), color.getBlue(), opacity));
+		gc.setBackground(new Color(MainSWT.getDisplay(), color.getRed(), color.getGreen(), color.getBlue()));
 		gc.setAlpha(opacity);
 		gc.fillRectangle(x, y, width, height);
 

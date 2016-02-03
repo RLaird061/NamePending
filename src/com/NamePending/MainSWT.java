@@ -27,7 +27,7 @@ public class MainSWT {
 		shell.setSize(500, 500);
 
 		Image img = new Image(display, SWTResourceManager.getImage(
-				MainSWT.class, "/com/NamePending/res/LauncherScreen.png")
+				MainSWT.class, "/com/NamePending/res/lolpoison.png")
 				.getImageData());
 		shell.setBackgroundImage(img);
 
