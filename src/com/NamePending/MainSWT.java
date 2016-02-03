@@ -7,12 +7,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.NamePending.unittest.UnitTests;
+import org.eclipse.swt.events.MouseMoveListener;
 
 public class MainSWT {
 	public static GameSWT gameFrame = null;
@@ -20,9 +22,31 @@ public class MainSWT {
 	private static Shell shell = null;
 	private static GameOptions gameOpt = null;
 	
+	private static boolean shellMoving = false;
+	private static Point shellPos;
+	
 	public static void main(String[] args) {
 		display = new Display();
-		shell = new Shell(display, SWT.NO_TRIM);
+		shell = new Shell(display, SWT.NONE);
+		shellPos = new Point(0, 0);
+		shell.addMouseMoveListener(new MouseMoveListener() {
+			public void mouseMove(MouseEvent e) {
+				if (shellMoving)
+					shell.setLocation(shell.getLocation().x+(e.x-shellPos.x),shell.getLocation().y+(e.y-shellPos.y));
+			}
+		});
+		shell.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				shellMoving = true;
+				shellPos.x = e.x;
+				shellPos.y = e.y;
+			}
+			@Override
+			public void mouseUp(MouseEvent e) {
+				shellMoving = false;
+			}
+		});
 		shell.setAlpha(0);
 		shell.setSize(500, 500);
 
@@ -77,6 +101,8 @@ public class MainSWT {
 				gameShell.setLocation(shell.getBounds().x, shell.getBounds().y);
 				gameShell.pack();
 				gameShell.open();
+				
+				gameFrame.addGameTimer();
 			}
 		});
 		btnPlay.setText("Play");
@@ -90,7 +116,7 @@ public class MainSWT {
 					if (!display.readAndDispatch()) 
 						display.sleep();
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					//e1.printStackTrace();
 				}
 		}
 		display.dispose();		

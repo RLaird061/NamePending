@@ -1,24 +1,27 @@
 package com.NamePending;
 
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Timer;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class GameSWT extends Composite
 {
@@ -31,15 +34,33 @@ public class GameSWT extends Composite
 	public final static int SELECTOR_WIDTH = 90;
 	public final static int SELECTOR_HEIGHT = 45;
 	
+	public final static int BI_UP = 0;
+	public final static int BI_DOWN = 1;
+	public final static int BI_LEFT = 2;
+	public final static int BI_RIGHT = 3;
+	public final static int BI_SPACE = 4;
+	
 	// Member Variables
 	private GameBoard gameboard;    // holds game logic
 	private GameComposite gamecomp; // game drawing
 	private Label lblScore;
 	private Text txtName;
+	private ProgressBar pbGameOverTimer;
+	
+	public boolean gameOverDirty = false;
+	public int gameOverSelection = 100;
+	public int gameOverDecreaseAmt = 5;
+	public int gameOverTimeout = 5000;
+	
+	// Buffered Input stuff
+	private ArrayList<Integer> bufferedInput;
 
 	// Member Functions
 	public GameSWT(Composite parent, int style) {
 		super(parent, style);
+		
+		bufferedInput = new ArrayList<Integer>();
+		
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -51,14 +72,19 @@ public class GameSWT extends Composite
 				int selX = p.x;
 				int selY = p.y;
 				if (e.keyCode == 0x1000001) { // Up
+					bufferedInput.add(BI_UP);
 					selY = (selY > 0) ? selY-1 : selY;
 				} else if (e.keyCode == 0x1000004) { // Down
+					bufferedInput.add(BI_DOWN);
 					selX = (selX < PIECES_PER_ROW-2) ? selX+1 : selX;
 				} else if (e.keyCode == 0x1000002) { // Right
+					bufferedInput.add(BI_RIGHT);
 					selY = (selY < PIECES_PER_COL-1) ? selY+1 : selY;
 				} else if (e.keyCode == 0x1000003) { // Left
+					bufferedInput.add(BI_LEFT);
 					selX = (selX > 0) ? selX-1 : selX;					
 				} else if (e.keyCode == 0x20) { // Space
+					bufferedInput.add(BI_SPACE);
 					gameboard.swap(selY * PIECES_PER_ROW + selX);
 				}
 				gamecomp.setSelector(new Point(selX, selY));
@@ -106,6 +132,10 @@ public class GameSWT extends Composite
 		btnGameover.setBounds(430, 381, 75, 25);
 		btnGameover.setText("GameOver");
 		
+		pbGameOverTimer = new ProgressBar(gamecomp, SWT.NONE);
+		pbGameOverTimer.setSelection(gameOverSelection);
+		pbGameOverTimer.setBounds(360, 86, 170, 17);
+		
 		setFocus();
 	}
 	
@@ -118,5 +148,31 @@ public class GameSWT extends Composite
 		int prev = Integer.parseInt(lblScore.getText());
 		String str = String.format("%d", score+prev);
 		lblScore.setText(str);
+	}
+	
+	public void addGameTimer() {
+		Timer myTimer = new Timer(gameOverTimeout, myAction);
+		myTimer.start();
+	}
+
+	private Action myAction = new AbstractAction() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//System.out.println("action");
+			if (gameOverSelection >= gameOverDecreaseAmt && !gameOverDirty)
+				gameOverSelection -= gameOverDecreaseAmt;
+
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					pbGameOverTimer.setSelection(gameOverSelection);
+					pbGameOverTimer.redraw();
+				}
+			});			
+		}
+	};
+	
+	public void addBufferedInputTimer() {
 	}
 }

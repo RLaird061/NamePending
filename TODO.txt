@@ -13,8 +13,6 @@
 
 - sliding/something(transition wise) BACKGROUND IMAGE (night and day or something)
 
-- flicker problem??
-
 - name??
 
 - graphics:
@@ -27,6 +25,11 @@
 - fix First Piece disappear bug!
 
 - selection moving to first piece bug!
+
+- make gameOver progress bar end the game and show a GameOver Screen
+
+- remove gameOver button
+
 
 
 DONE:
@@ -42,7 +45,8 @@ DONE:
 - graphics:
   - balloons
 
+- flicker problem??
 
-
+- gameOver progress bar
 
 

@@ -93,14 +93,16 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	public void transitionDone() {
 		// TODO: prevent any other keyboard input and/or transitions before we are done
 		// because accepting them causes strange bugs that are gunna be super stupid to debug
-		for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
-			TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
-			tc.setVisible(true);
+		if (neighbor != null) {
+			neighbor.setVisible(true);
+			neighbor = null;
+		} else {
+			for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+				TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
+				tc.setVisible(true);
+			}
 		}
 		setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
-		// copy back proper piece after transition effect
-		if (tempImage != null)
-			pieceImage = new Image(MainSWT.getDisplay(), tempImage, SWT.IMAGE_COPY);
 	}
 	
 	public void setSelector(int selected_side) {
@@ -288,7 +290,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	private void drawOutlineRect(GC gc, Color color, int x, int y, int width, int height, int opacity, boolean bothsides)
 	{
 		// draw an entire background color with some alpha/opacity
-		gc.setBackground(new Color(MainSWT.getDisplay(), color.getRed(), color.getGreen(), color.getBlue()));
+		gc.setBackground(new Color(MainSWT.getDisplay(), color.getRed(), color.getGreen(), color.getBlue(), opacity));
 		gc.setAlpha(opacity);
 		gc.fillRectangle(x, y, width, height);
 
