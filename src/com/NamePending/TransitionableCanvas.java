@@ -14,17 +14,21 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.opengl.GLCanvas;
+import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
-public class TransitionableCanvas extends Canvas implements Transitionable {
+public class TransitionableCanvas extends GLCanvas implements Transitionable {
 	public static final int NOT_SELECTED = 0;	 // not selected
 	public static final int SELECTED_RIGHT = 1;  // has right part of selector
 	public static final int SELECTED_LEFT = 2;   // has left part of selector
@@ -42,14 +46,18 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	private DoubleCubicRotationTransition dct = null;
 	private MultiSlideUpTransition msut = null; // Don't use for swaps!
 	
-	public TransitionableCanvas(Composite parent, int style, int idx) {
-		super(parent, style);
+	private volatile boolean animating = false;
+	private Thread animateThread = null;	
+	
+	public TransitionableCanvas(Composite parent, int style, GLData data, int idx) {
+		super(parent, style, data);
 		index = idx;
+
 		if (tm == null) {
 			tm = new TransitionManager(this);
 			tm.addTransitionListener(new TransitionListener() {
 				public void transitionFinished(TransitionManager tm) {
-					System.out.println("done");
+					//System.out.println("done");
 					transitionDone();
 				}
 			});
@@ -61,6 +69,7 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		
 		addPaintListener(new PaintListener()  { /* paint listener. */
 			public void paintControl(final PaintEvent event) {
+				
 				if (pieceImage != null) {
 					int xPos = selected_idx % GameSWT.PIECES_PER_ROW;
 					int yPos = selected_idx / GameSWT.PIECES_PER_COL;
@@ -68,22 +77,27 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 					yPos *= GameSWT.PIECE_LENGTH;
 					if (oldImage != null) {
 						event.gc.drawImage(oldImage, 0, 0);
-						drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), xPos, yPos,
+						drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 0, 0, 0), xPos, yPos,
 								GameSWT.SELECTOR_WIDTH, GameSWT.SELECTOR_HEIGHT, 25, true);						
 						oldImage = null;
 					} else {
 						event.gc.drawImage(pieceImage, 0, 0);
 						Point p = getSize();
 						if (p.x > GameSWT.PIECE_LENGTH)
-							drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), xPos, yPos,
+							drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 0, 0, 0), xPos, yPos,
 									GameSWT.SELECTOR_WIDTH, GameSWT.SELECTOR_HEIGHT, 25, true);						
 					}
 				}
 
 				if (selected > NOT_SELECTED)
 				{
+//					if (selected == SELECTED_LEFT)
+//						System.out.printf("%d,%d - ", index % GameSWT.PIECES_PER_ROW, index / GameSWT.PIECES_PER_ROW);
+//					else 
+//						System.out.printf("%d,%d\n", index % GameSWT.PIECES_PER_ROW, index / GameSWT.PIECES_PER_ROW);
+
 					// draw half of a selector part
-					drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 255, 255, 0), 0, 0,
+					drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 0, 0, 0), 0, 0,
 							GameSWT.SELECTOR_WIDTH/2, GameSWT.SELECTOR_HEIGHT, 25, false);						
 				}
 			}
@@ -93,16 +107,24 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	public void transitionDone() {
 		// TODO: prevent any other keyboard input and/or transitions before we are done
 		// because accepting them causes strange bugs that are gunna be super stupid to debug
+		//System.out.println("done");
+
+		setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
+		if (tempImage != null) {
+			setPieceImage(tempImage);
+			tempImage = null;
+		}
+
 		if (neighbor != null) {
 			neighbor.setVisible(true);
 			neighbor = null;
 		} else {
-			for (int idx = 0; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
+			for (int idx = 1; idx < (GameSWT.PIECES_PER_ROW * GameSWT.PIECES_PER_COL); idx++) {
 				TransitionableCanvas tc = ((GameComposite)getParent()).lbls.get(idx);
 				tc.setVisible(true);
+				tc.redraw();
 			}
 		}
-		setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
 	}
 	
 	public void setSelector(int selected_side) {
@@ -128,11 +150,15 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		setSize(p.x*2, p.y);
 		
 		tempImage = new Image(MainSWT.getDisplay(), pieceImage, SWT.IMAGE_COPY);
+		
 		ImageData d1 = tempImage.getImageData();
 		ImageData d2 = neighbor.getPieceImage().getImageData();
 		ImageData data = new ImageData(d1.width*2, d1.height, d1.depth, d1.palette);
 		int[] pixels = new int[d1.width];
 		byte[] alphas = new byte[d1.width];
+
+		//System.out.printf("swap anim %d\n", tempImage.getBounds().height);
+		
 		for (int y = 0; y < tempImage.getBounds().height; y++)
 		{
 			d1.getPixels(0, y, d1.width, pixels, 0);
@@ -160,12 +186,9 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}		
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 		
-		
 		GC gc = new GC(this, SWT.NONE);
 		dct.start(oldImage, pieceImage, gc, getDirection(0,0));
-		gc.dispose();
-		
-		
+
 		transitionDone();
 //		tm.setTransition(dct);
 //		tm.startTransition(0, 0, getDirection(0,0));

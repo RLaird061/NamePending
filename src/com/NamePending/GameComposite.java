@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -20,7 +21,7 @@ public class GameComposite extends Composite {
 	public GameComposite(Composite parent, int style) {
 		super(parent, style);
 
-		selector = new Point(-1, -1);
+		selector = new Point(-1, -1); // invalid start point
 		
 		int xPos = GameSWT.BORDER_WIDTH;
 		int yPos = GameSWT.BORDER_WIDTH;
@@ -29,7 +30,12 @@ public class GameComposite extends Composite {
 		{
 			for (int x = 0; x < GameSWT.PIECES_PER_ROW; x++)
 			{
-				TransitionableCanvas tl = new TransitionableCanvas(this, SWT.DOUBLE_BUFFERED, y * GameSWT.PIECES_PER_ROW + x);
+				GLData data = new GLData();
+				data.doubleBuffer = true;
+				TransitionableCanvas tl = new TransitionableCanvas(this, 
+						SWT.DOUBLE_BUFFERED,
+						data,
+						y * GameSWT.PIECES_PER_ROW + x);
 				lbls.add(tl);
 				tl.setBounds(xPos, yPos, GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);
 				xPos += GameSWT.PIECE_LENGTH;
@@ -46,6 +52,12 @@ public class GameComposite extends Composite {
 				{
 					event.gc.drawImage(backgroundImage, 0, 0);
 				}
+				
+				event.gc.setBackground(new Color(MainSWT.getDisplay(), 10, 10, 10)); // black
+				// rectangle around the game board
+				event.gc.drawRectangle(GameSWT.BORDER_WIDTH-1, GameSWT.BORDER_WIDTH-1, 
+						GameSWT.PIECES_PER_ROW * GameSWT.PIECE_LENGTH + 2, 
+						GameSWT.PIECES_PER_COL * GameSWT.PIECE_LENGTH + 2);
 			}
 		});
 	}

@@ -78,7 +78,10 @@ public class GameBoard {
 		Piece p2 = get(swap_point+1);
 		TransitionableCanvas t2 = (TransitionableCanvas) gameComposite.lbls.get(swap_point+1);
 
+		System.out.println("swap start");
 		t1.doSwapAnim();
+		System.out.println("swap end");
+		
 		t1.setPieceImage(p1.getImage());
 		t2.setPieceImage(p2.getImage());
 		
@@ -120,7 +123,7 @@ public class GameBoard {
 	//     if no pieces are scored/removed return 0
 	public int solver(int swap_point, boolean first_solve, boolean no_anim)
 	{
-		// detect swap multiplier (ie: 3x3x5 stuff)
+		// detect swap multiplier (ex: 3x3x5 stuff)
 		if (first_solve)
 			multipler = solverFindMultiplier(swap_point, false);
 		
@@ -233,10 +236,11 @@ public class GameBoard {
 			for (y = 0; y < GameSWT.PIECES_PER_COL; y++) {
 				int idx = y * GameSWT.PIECES_PER_ROW + x;
 				int mark = marker.get(idx);
-				if (tmpy == -1 && mark == MARK_TOREMOVE) {
+				boolean isM = (mark == MARK_TOREMOVE);
+				if (tmpy == -1 && isM) {
 					tmpy = y;
 					h++;
-				} else if (mark == MARK_TOREMOVE) {
+				} else if (isM) {
 					h++;
 				}
 			}
@@ -276,11 +280,14 @@ public class GameBoard {
 					// go down looking for a piece below if found move it up here
 					for (; tmpy < GameSWT.PIECES_PER_COL && !found; tmpy++) {
 						int tmpi = tmpy * GameSWT.PIECES_PER_ROW + tmpx;
-						if (marker.get(tmpi) != MARK_GETNEWPIECEFROMBELOW && marker.get(tmpi) != MARK_TOREMOVE) {
+						int mi = marker.get(tmpi);
+						boolean isM = (mi != MARK_GETNEWPIECEFROMBELOW && mi != MARK_TOREMOVE);
+						if (isM) {
 							set(i, get(tmpi)); // move piece up
 							set(tmpi, Piece.pieces.get(0) /* NullPiece */);
 							
-							marker.set(tmpi, MARK_GETNEWPIECEFROMBELOW);
+							if (mi != MARK_TOREMOVE)
+								marker.set(tmpi, MARK_GETNEWPIECEFROMBELOW);
 							found = true;
 						}
 					}
