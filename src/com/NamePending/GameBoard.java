@@ -67,7 +67,7 @@ public class GameBoard {
 	// this makes it so we don't have to do any bounds checking
 	public void swap(int swap_point)
 	{
-		MainSWT.getGameFrame().gameOverDirty = true; // don't touch timer
+		MainSWT.getGameFrame().gameOverMoveMade = true; // don't touch timer
 		
 		Piece tmp = get(swap_point);
 		set(swap_point, get(swap_point+1));
@@ -78,10 +78,7 @@ public class GameBoard {
 		Piece p2 = get(swap_point+1);
 		TransitionableCanvas t2 = (TransitionableCanvas) gameComposite.lbls.get(swap_point+1);
 
-		System.out.println("swap start");
 		t1.doSwapAnim();
-		System.out.println("swap end");
-		
 		t1.setPieceImage(p1.getImage());
 		t2.setPieceImage(p2.getImage());
 		
@@ -114,7 +111,7 @@ public class GameBoard {
 			MainSWT.getGameFrame().addToScore(acc_score);
 			MainSWT.getGameFrame().gameOverSelection = 100;
 		}
-		MainSWT.getGameFrame().gameOverDirty = false;
+		MainSWT.getGameFrame().gameOverMoveMade = false;
 	}
 	
 	// solver is the meat of the game; any 3 or more pieces in a row will score/disappear

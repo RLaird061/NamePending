@@ -1,7 +1,8 @@
 package com.NamePending;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import org.eclipse.nebula.effects.stw.Transition;
 
 /*******************************************************************************
  * Copyright (c) 2010 Ahmed Mahran and others.
@@ -17,7 +18,6 @@ import java.util.Arrays;
  *     		from cells in a grid moving up at the same time)
  *******************************************************************************/
 
-import org.eclipse.nebula.effects.stw.Transition;
 import org.eclipse.nebula.effects.stw.TransitionManager;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -30,7 +30,7 @@ import org.eclipse.swt.graphics.Rectangle;
  *  
  * @author Ahmed Mahran (ahmahran@gmail.com)
  */
-public class MultiSlideUpTransition extends org.eclipse.nebula.effects.stw.Transition {
+public class MultiSlideUpTransition extends Transition {
 
     private int _w, _halfW, _h[], _halfH[];
     private double _a[], _x[], _y[], _x0[], _y0[], _v0[];

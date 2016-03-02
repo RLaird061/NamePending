@@ -6,13 +6,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class GameDatabase {
+	
+	public class HighScore {
+		private String name;
+		private int score;
+		
+		public HighScore(String n, int s)
+		{
+			name = n;
+			score = s;
+		}
+		public String getName()
+		{
+			return name;
+		}
+		public int getScore()
+		{
+			return score;
+		}
+	}
+	
 	private Connection connect = null;
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 	private String databaseFile;
+	public ArrayList<HighScore> highscores = null;
 
 	public void writeOptions(String key, int value) throws Exception {
 		try {
@@ -160,8 +182,9 @@ public class GameDatabase {
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
 			// Result set get the result of the SQL query
+			// getting highscores in descending order (highest score first)
 			resultSet = statement
-					.executeQuery("select * from highscores");
+					.executeQuery("SELECT * FROM highscores ORDER BY Score DESC");
 			writeResultSet(resultSet);
 		} catch (Exception e) {
 			System.out.println("Database connection errror");
@@ -185,6 +208,11 @@ public class GameDatabase {
 
 	private void writeResultSet(ResultSet resultSet) throws SQLException {
 		// ResultSet is initially before the first data set
+		if (highscores == null)
+			highscores = new ArrayList<HighScore>();
+		
+		highscores.clear();
+		
 		while (resultSet.next()) {
 			// It is possible to get the columns via name
 			// also possible to get the columns via the column number
@@ -193,6 +221,8 @@ public class GameDatabase {
 			String name = resultSet.getString("Name");
 			Integer score = resultSet.getInt("Score");
 			System.out.printf("Name: %s   Score: %d\n", name, score);
+			
+			highscores.add(new HighScore(name, score));
 		}
 	}
 

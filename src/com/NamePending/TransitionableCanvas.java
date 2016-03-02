@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.eclipse.nebula.effects.stw.Transition;
-import org.eclipse.nebula.effects.stw.TransitionListener;
 import org.eclipse.nebula.effects.stw.TransitionManager;
 import org.eclipse.nebula.effects.stw.Transitionable;
 import org.eclipse.nebula.effects.stw.transitions.CubicRotationTransition;
@@ -14,21 +13,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class TransitionableCanvas extends GLCanvas implements Transitionable {
+public class TransitionableCanvas extends Canvas implements Transitionable {
+
 	public static final int NOT_SELECTED = 0;	 // not selected
 	public static final int SELECTED_RIGHT = 1;  // has right part of selector
 	public static final int SELECTED_LEFT = 2;   // has left part of selector
@@ -47,25 +45,20 @@ public class TransitionableCanvas extends GLCanvas implements Transitionable {
 	private MultiSlideUpTransition msut = null; // Don't use for swaps!
 	
 	private volatile boolean animating = false;
-	private Thread animateThread = null;	
 	
 	public TransitionableCanvas(Composite parent, int style, GLData data, int idx) {
-		super(parent, style, data);
+		super(parent, style);
 		index = idx;
 
 		if (tm == null) {
 			tm = new TransitionManager(this);
-			tm.addTransitionListener(new TransitionListener() {
-				public void transitionFinished(TransitionManager tm) {
-					//System.out.println("done");
-					transitionDone();
-				}
-			});
 		}
+
+		// TODO:  move these to be instanced only when and if needed?
 		st = new SlideTransition(tm, 60, 500);
 		ft = new FadeTransition(tm, 60, 500);
 		ct = new CubicRotationTransition(tm, 60, 500);
-		dct = new DoubleCubicRotationTransition(tm, 60, 500);
+		dct = new DoubleCubicRotationTransition(tm, 60, 500);		
 		
 		addPaintListener(new PaintListener()  { /* paint listener. */
 			public void paintControl(final PaintEvent event) {
@@ -91,11 +84,6 @@ public class TransitionableCanvas extends GLCanvas implements Transitionable {
 
 				if (selected > NOT_SELECTED)
 				{
-//					if (selected == SELECTED_LEFT)
-//						System.out.printf("%d,%d - ", index % GameSWT.PIECES_PER_ROW, index / GameSWT.PIECES_PER_ROW);
-//					else 
-//						System.out.printf("%d,%d\n", index % GameSWT.PIECES_PER_ROW, index / GameSWT.PIECES_PER_ROW);
-
 					// draw half of a selector part
 					drawOutlineRect(event.gc, new Color(MainSWT.getDisplay(), 0, 0, 0), 0, 0,
 							GameSWT.SELECTOR_WIDTH/2, GameSWT.SELECTOR_HEIGHT, 25, false);						
@@ -105,10 +93,6 @@ public class TransitionableCanvas extends GLCanvas implements Transitionable {
 	}
 
 	public void transitionDone() {
-		// TODO: prevent any other keyboard input and/or transitions before we are done
-		// because accepting them causes strange bugs that are gunna be super stupid to debug
-		//System.out.println("done");
-
 		setSize(GameSWT.PIECE_LENGTH, GameSWT.PIECE_LENGTH);         // size back to normal
 		if (tempImage != null) {
 			setPieceImage(tempImage);
@@ -185,13 +169,11 @@ public class TransitionableCanvas extends GLCanvas implements Transitionable {
 			data.setAlphas(d1.width, y, d1.width, alphas, 0);
 		}		
 		pieceImage = new Image(MainSWT.getDisplay(), data);
-		
+
 		GC gc = new GC(this, SWT.NONE);
 		dct.start(oldImage, pieceImage, gc, getDirection(0,0));
-
-		transitionDone();
-//		tm.setTransition(dct);
-//		tm.startTransition(0, 0, getDirection(0,0));
+ 
+		transitionDone();		
 	}
 	
 	public void doSlideUpAnimStep1(ArrayList<Rectangle> rects, ArrayList<Integer> heights)
@@ -267,14 +249,12 @@ public class TransitionableCanvas extends GLCanvas implements Transitionable {
 			}
 		}
 		pieceImage = new Image(MainSWT.getDisplay(), data);
-		
+
 		GC gc = new GC(this, SWT.DOUBLE_BUFFERED);
 		msut.start(oldImage, pieceImage, gc, getDirection(0,0));
 		gc.dispose();
 		
-		transitionDone();
-//		tm.setTransition(msut);
-//		tm.startTransition(0, 0, Transition.DIR_UP);		
+		transitionDone();		
 	}
 	
 	@Override

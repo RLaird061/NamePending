@@ -1,5 +1,7 @@
 package com.NamePending;
 
+import org.eclipse.nebula.effects.stw.Transition;
+
 /*******************************************************************************
  * Copyright (c) 2010 Ahmed Mahran and others.
  * All rights reserved. This program and the accompanying materials
@@ -12,12 +14,10 @@ package com.NamePending;
  *     rl - DoubleCubicRotationTransition
  *******************************************************************************/
 
-import org.eclipse.nebula.effects.stw.Transition;
 import org.eclipse.nebula.effects.stw.TransitionManager;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-
 /**
  * A cubic rotation effect. Showing two sides of a cube, the cube rotates from one
  * side to the other side.

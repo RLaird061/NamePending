@@ -6,6 +6,7 @@ import org.eclipse.nebula.animation.movement.ExpoOut;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
@@ -15,6 +16,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.NamePending.unittest.UnitTests;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class MainSWT {
 	public static GameSWT gameFrame = null;
@@ -24,7 +27,12 @@ public class MainSWT {
 	
 	private static boolean shellMoving = false;
 	private static Point shellPos;
-	
+
+/*! \brief main entry point of program.
+ *         main(String[] args) no arguments handled currently
+ *
+ *  Detailed description of main...
+ */	
 	public static void main(String[] args) {
 		display = new Display();
 		shell = new Shell(display, SWT.NONE);
@@ -63,22 +71,43 @@ public class MainSWT {
 		shell.open();
 		AlphaEffect.setAlpha(animationRunner, shell, 255, 1900, new ExpoOut(), null, null);
 		
-		Button btnExit = new Button(shell, SWT.NONE);
-		btnExit.addMouseListener(new MouseAdapter() {
+		Button btnPlay = new Button(shell, SWT.NONE);
+		btnPlay.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void mouseUp(MouseEvent e) {
-				if (gameFrame != null)
-					gameFrame.dispose();
-				shell.close();
+			public void widgetSelected(SelectionEvent arg0) {
+				// open GameSWT window and maybe close this window
+				
+				// TODO: move all this to a seperate process???
+				try {
+					Shell gameShell = new Shell(display, SWT.CLOSE);
+					gameFrame = new GameSWT(gameShell, SWT.DOUBLE_BUFFERED);
+					
+					gameShell.setText("_NamePendingGame_");
+					Image img = new Image(display, SWTResourceManager.getImage(
+							MainSWT.class, "/com/NamePending/res/Icon.png")
+							.getImageData());
+					gameShell.setImage(img);
+					
+					gameShell.setLocation(shell.getBounds().x, shell.getBounds().y);
+					gameShell.pack();
+					gameShell.open();
+					
+					MainSWT.shell.setVisible(false);
+					
+					gameFrame.addGameTimer();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
-		btnExit.setBounds(398, 458, 92, 32);
-		btnExit.setText("Exit");
+		btnPlay.setText("Play");
+		btnPlay.setBounds(398, 382, 92, 32);
 		
 		Button btnOpt = new Button(shell, SWT.NONE);	
-		btnOpt.addMouseListener(new MouseAdapter() {
+		btnOpt.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void mouseUp(MouseEvent e) {
+			public void widgetSelected(SelectionEvent arg0) {
 				// opens GameOptions window
 				
 				// TODO: make good-looking options window
@@ -89,37 +118,28 @@ public class MainSWT {
 		btnOpt.setText("Options");
 		btnOpt.setBounds(398, 420, 92, 32);
 		
-		Button btnPlay = new Button(shell, SWT.NONE);
-		btnPlay.addMouseListener(new MouseAdapter() {
+		Button btnExit = new Button(shell, SWT.NONE);
+		btnExit.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void mouseUp(MouseEvent e) {
-				// open GameSWT window and maybe close this window
-				
-				// TODO: move all this to a seperate process???
-				Shell gameShell = new Shell(display, SWT.NONE);
-				gameFrame = new GameSWT(gameShell, SWT.DOUBLE_BUFFERED); // TODO: put in center? params useless?
-				gameShell.setLocation(shell.getBounds().x, shell.getBounds().y);
-				gameShell.pack();
-				gameShell.open();
-				
-				gameFrame.addGameTimer();
+			public void widgetSelected(SelectionEvent arg0) {
+				if (gameFrame != null)
+					gameFrame.dispose();
+				shell.close();
 			}
 		});
-		btnPlay.setText("Play");
-		btnPlay.setBounds(398, 382, 92, 32);
+		btnExit.setBounds(398, 458, 92, 32);
+		btnExit.setText("Exit");
 		
-		//UnitTests ut = new UnitTests(gb);
-		//ut.UnitTest1();
-		
-		while (!shell.isDisposed()) {
-				try {
-					if (!display.readAndDispatch()) 
-						display.sleep();
-				} catch (Exception e1) {
-					//e1.printStackTrace();
-				}
-		}
-		display.dispose();		
+		try {
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch()) 
+					display.sleep();
+			}
+			display.dispose();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}		
 	}
 
 	public static Display getDisplay() {
