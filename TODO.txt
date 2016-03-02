@@ -1,5 +1,3 @@
-- game over screen
-
 - sliding/something(transition wise) BACKGROUND IMAGE (night and day or something)
 
 - input buffer ... enter keys faster!
@@ -20,12 +18,7 @@
 
 - change keymapping with options
 
-- selection moving to first piece bug!
-
-- make gameOver progress bar end the game and show a GameOver Screen
-
-- remove gameOver button
-
+- selection moving to first piece bug! and/or to other location
 
 - paint listener is not called or not two pieces selected after swapping first piece TWICE!
 
@@ -53,4 +46,10 @@ DONE:
 - gameOver progress bar
 
 - fix First Piece disappear bug!
+
+- game over screen
+
+- remove gameOver button
+
+- make gameOver progress bar end the game and show a GameOver Screen
 

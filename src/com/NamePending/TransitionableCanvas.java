@@ -126,6 +126,8 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 	}
 	
 	public void doSwapAnim() {
+		if (animating)
+			return;
 		// temporary expand this piece to take up two piece space and do transition effect
 		// such that both pieces look like they are getting transitioned at the same time
 		neighbor = ((GameComposite)getParent()).lbls.get(index+1);		
@@ -170,10 +172,14 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}		
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 
-		GC gc = new GC(this, SWT.NONE);
-		dct.start(oldImage, pieceImage, gc, getDirection(0,0));
- 
-		transitionDone();		
+		if (!animating) {
+			animating = true;
+			GC gc = new GC(this, SWT.NONE);
+			// start() calls readAndDispatch() so, prevent re-entry with animating flag
+			dct.start(oldImage, pieceImage, gc, getDirection(0,0));
+			transitionDone();
+			animating = false;
+		}
 	}
 	
 	public void doSlideUpAnimStep1(ArrayList<Rectangle> rects, ArrayList<Integer> heights)
@@ -224,6 +230,9 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 
 	public void doSlideUpAnimStep2()
 	{
+		if (animating)
+			return;
+		
 		int w = GameSWT.PIECES_PER_ROW * GameSWT.PIECE_LENGTH;
 		int h = GameSWT.PIECES_PER_COL * GameSWT.PIECE_LENGTH;
 		ImageData data = new ImageData(w, h, pieceImage.getImageData().depth, pieceImage.getImageData().palette); 
@@ -250,9 +259,14 @@ public class TransitionableCanvas extends Canvas implements Transitionable {
 		}
 		pieceImage = new Image(MainSWT.getDisplay(), data);
 
-		GC gc = new GC(this, SWT.DOUBLE_BUFFERED);
-		msut.start(oldImage, pieceImage, gc, getDirection(0,0));
-		gc.dispose();
+		if (!animating) {
+			animating = true;
+			GC gc = new GC(this, SWT.DOUBLE_BUFFERED);
+			// start() calls readAndDispatch() so, prevent re-entry with animating flag			
+			msut.start(oldImage, pieceImage, gc, getDirection(0,0));
+			gc.dispose();
+			animating = false;
+		}
 		
 		transitionDone();		
 	}
